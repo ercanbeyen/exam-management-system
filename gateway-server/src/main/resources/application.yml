@@ -1,0 +1,22 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: GATEWAY-SERVER
+  cloud:
+    gateway:
+      routes:
+        - id: SCHOOL-SERVICE
+          uri: lb://SCHOOL-SERVICE
+          predicates:
+            - Path=/schools/**
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    hostname: localhost
