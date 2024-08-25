@@ -1,5 +1,6 @@
 package com.ercanbeyen.schoolservice.controller;
 
+import com.ercanbeyen.schoolservice.dto.SchoolDto;
 import com.ercanbeyen.schoolservice.entity.School;
 import com.ercanbeyen.schoolservice.service.SchoolService;
 import lombok.RequiredArgsConstructor;
@@ -15,22 +16,22 @@ public class SchoolController {
     private final SchoolService schoolService;
 
     @PostMapping
-    public ResponseEntity<School> createSchool(@RequestBody School school) {
-        return ResponseEntity.ok(schoolService.createSchool(school));
+    public ResponseEntity<SchoolDto> createSchool(@RequestBody SchoolDto request) {
+        return ResponseEntity.ok(schoolService.createSchool(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<School> updateSchool(@PathVariable int id, @RequestBody School school) {
-        return ResponseEntity.ok(schoolService.updateSchool(id, school));
+    public ResponseEntity<SchoolDto> updateSchool(@PathVariable int id, @RequestBody SchoolDto request) {
+        return ResponseEntity.ok(schoolService.updateSchool(id, request));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<School> getSchool(@PathVariable int id) {
+    public ResponseEntity<SchoolDto> getSchool(@PathVariable int id) {
         return ResponseEntity.ok(schoolService.getSchool(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<School>> getSchools() {
+    public ResponseEntity<List<SchoolDto>> getSchools() {
         return ResponseEntity.ok(schoolService.getSchools());
     }
 

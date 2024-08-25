@@ -1,5 +1,6 @@
 package com.ercanbeyen.studentservice.controller;
 
+import com.ercanbeyen.studentservice.dto.StudentDto;
 import com.ercanbeyen.studentservice.entity.Student;
 import com.ercanbeyen.studentservice.service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -15,22 +16,22 @@ public class StudentController {
     private final StudentService studentService;
 
     @PostMapping
-    public ResponseEntity<Student> createStudent(@RequestBody Student student) {
-        return ResponseEntity.ok(studentService.createStudent(student));
+    public ResponseEntity<StudentDto> createStudent(@RequestBody StudentDto request) {
+        return ResponseEntity.ok(studentService.createStudent(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Student> updateStudent(@PathVariable String id, @RequestBody Student student) {
-        return ResponseEntity.ok(studentService.updateStudent(id, student));
+    public ResponseEntity<StudentDto> updateStudent(@PathVariable String id, @RequestBody StudentDto request) {
+        return ResponseEntity.ok(studentService.updateStudent(id, request));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Student> getStudent(@PathVariable String id) {
+    public ResponseEntity<StudentDto> getStudent(@PathVariable String id) {
         return ResponseEntity.ok(studentService.getStudent(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<Student>> getStudents() {
+    public ResponseEntity<List<StudentDto>> getStudents() {
         return ResponseEntity.ok(studentService.getStudents());
     }
 
