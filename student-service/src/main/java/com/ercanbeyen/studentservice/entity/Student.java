@@ -13,7 +13,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Student {
     @Id
     private String id;
-    private String fullName;
+    private String name;
     private int age;
     private String gender;
+    private Integer schoolId;
 }

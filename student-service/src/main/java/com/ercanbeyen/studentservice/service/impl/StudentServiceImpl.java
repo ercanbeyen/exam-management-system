@@ -1,25 +1,34 @@
 package com.ercanbeyen.studentservice.service.impl;
 
+import com.ercanbeyen.servicecommon.client.SchoolServiceClient;
+import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.studentservice.dto.StudentDto;
 import com.ercanbeyen.studentservice.entity.Student;
 import com.ercanbeyen.studentservice.mapper.StudentMapper;
 import com.ercanbeyen.studentservice.repository.StudentRepository;
 import com.ercanbeyen.studentservice.service.StudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
     private final StudentRepository studentRepository;
     private final StudentMapper studentMapper;
+    private final SchoolServiceClient schoolServiceClient;
 
     @Override
-    public StudentDto createStudent(StudentDto studentDto) {
-        Student student = studentMapper.dtoToEntity(studentDto);
+    public StudentDto createStudent(StudentDto request) {
+        ResponseEntity<SchoolDto> schoolDto = schoolServiceClient.getSchool(request.schoolId());
+
+        Student student = studentMapper.dtoToEntity(request);
+        student.setSchoolId(Objects.requireNonNull(schoolDto.getBody()).id());
+
         return studentMapper.entityToDto(studentRepository.save(student));
     }
 
@@ -28,7 +37,10 @@ public class StudentServiceImpl implements StudentService {
         Student studentInDb = studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student is not found"));
 
-        studentInDb.setFullName(request.fullName());
+        ResponseEntity<SchoolDto> schoolDto = schoolServiceClient.getSchool(request.schoolId());
+
+        studentInDb.setSchoolId(Objects.requireNonNull(schoolDto.getBody()).id());
+        studentInDb.setName(request.name());
         studentInDb.setAge(request.age());
         studentInDb.setGender(request.gender());
 

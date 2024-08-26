@@ -1,6 +1,6 @@
 package com.ercanbeyen.schoolservice.service.impl;
 
-import com.ercanbeyen.schoolservice.dto.SchoolDto;
+import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.schoolservice.entity.School;
 import com.ercanbeyen.schoolservice.mapper.SchoolMapper;
 import com.ercanbeyen.schoolservice.repository.SchoolRepository;

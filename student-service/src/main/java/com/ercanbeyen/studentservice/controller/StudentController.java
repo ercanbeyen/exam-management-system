@@ -1,7 +1,6 @@
 package com.ercanbeyen.studentservice.controller;
 
 import com.ercanbeyen.studentservice.dto.StudentDto;
-import com.ercanbeyen.studentservice.entity.Student;
 import com.ercanbeyen.studentservice.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

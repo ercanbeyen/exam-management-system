@@ -1,7 +1,6 @@
 package com.ercanbeyen.schoolservice.controller;
 
-import com.ercanbeyen.schoolservice.dto.SchoolDto;
-import com.ercanbeyen.schoolservice.entity.School;
+import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.schoolservice.service.SchoolService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
