@@ -8,6 +8,7 @@ import com.ercanbeyen.studentservice.mapper.StudentMapper;
 import com.ercanbeyen.studentservice.repository.StudentRepository;
 import com.ercanbeyen.studentservice.service.StudentService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
@@ -34,8 +36,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public StudentDto updateStudent(String id, StudentDto request) {
-        Student studentInDb = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Student is not found"));
+        Student studentInDb = findById(id);
 
         ResponseEntity<SchoolDto> schoolDto = schoolServiceClient.getSchool(request.schoolId());
 
@@ -47,11 +48,18 @@ public class StudentServiceImpl implements StudentService {
         return studentMapper.entityToDto(studentRepository.save(studentInDb));
     }
 
-    @Override
-    public StudentDto getStudent(String id) {
+    private Student findById(String id) {
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student is not found"));
 
+      log.info("Student is found");
+
+      return student;
+    }
+
+    @Override
+    public StudentDto getStudent(String id) {
+        Student student = findById(id);
         return studentMapper.entityToDto(student);
     }
 
