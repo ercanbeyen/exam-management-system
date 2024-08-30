@@ -24,6 +24,7 @@
 		<module>eureka-server</module>
 		<module>gateway-server</module>
 		<module>zipkin-server</module>
+		<module>config-server</module>
 		<module>service-common</module>
 		<module>school-service</module>
 		<module>student-service</module>
@@ -46,6 +47,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
