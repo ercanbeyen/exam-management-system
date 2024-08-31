@@ -1,12 +1,12 @@
 server:
-  port: 8083
+  port: 8081
 
 spring:
   application:
-    name: SCHOOL-SERVICE
+    name: EXAM-SERVICE
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/school_service
+    url: jdbc:mysql://localhost:3306/exam_service
     username: root
     password: password
   jpa:
