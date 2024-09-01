@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.3.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.ercanbeyen</groupId>
 	<artifactId>exam-management-system</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -25,28 +28,12 @@
 		<module>gateway-server</module>
 		<module>zipkin-server</module>
 		<module>config-server</module>
+		<module>service-parent</module>
 		<module>service-common</module>
 		<module>school-service</module>
 		<module>student-service</module>
 		<module>exam-service</module>
 	</modules>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
 
 	<dependencyManagement>
 		<dependencies>
@@ -59,22 +46,5 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>
