@@ -39,8 +39,7 @@ public class SchoolServiceImpl implements SchoolService {
 
     @Override
     public SchoolDto getSchool(Integer id) {
-        School school = findById(id);
-        return schoolMapper.entityToDto(school);
+        return schoolMapper.entityToDto(findById(id));
     }
 
     @Override
@@ -61,7 +60,8 @@ public class SchoolServiceImpl implements SchoolService {
         return "School " + id + " is successfully deleted";
     }
 
-    private School findById(Integer id) {
+    @Override
+    public School findById(Integer id) {
         School school = schoolRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("School is not found"));
 
