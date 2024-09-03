@@ -12,5 +12,4 @@ public interface SchoolService {
     List<SchoolDto> getSchools();
     String deleteSchool(Integer id);
     School findById(Integer id);
-
 }

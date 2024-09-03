@@ -1,10 +1,8 @@
 package com.ercanbeyen.examservice.entity;
 
+import com.ercanbeyen.examservice.embeddable.ExamTime;
 import jakarta.persistence.*;
 import lombok.Data;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Data
 @Entity
@@ -14,7 +12,6 @@ public class Exam {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String subject;
-    private LocalDate date;
-    private LocalTime startedAt;
-    private LocalTime finishedAt;
+    @Embedded
+    private ExamTime time;
 }
