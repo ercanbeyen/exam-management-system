@@ -58,7 +58,8 @@ public class ExamServiceImpl implements ExamService {
         return "Exam " + id + " is successfully deleted";
     }
 
-    private Exam findById(String id) {
+    @Override
+    public Exam findById(String id) {
         Exam exam = examRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Exam is not found"));
 

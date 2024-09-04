@@ -4,6 +4,8 @@ import com.ercanbeyen.examservice.embeddable.ExamTime;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "exams")
@@ -14,4 +16,6 @@ public class Exam {
     private String subject;
     @Embedded
     private ExamTime time;
+    @OneToMany(mappedBy = "exam")
+    private List<ExamEvent> examEvents;
 }

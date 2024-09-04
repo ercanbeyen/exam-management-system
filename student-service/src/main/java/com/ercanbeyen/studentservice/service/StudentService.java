@@ -1,6 +1,6 @@
 package com.ercanbeyen.studentservice.service;
 
-import com.ercanbeyen.studentservice.dto.StudentDto;
+import com.ercanbeyen.servicecommon.client.contract.StudentDto;
 
 import java.util.List;
 

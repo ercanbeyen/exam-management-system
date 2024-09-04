@@ -1,6 +1,6 @@
 package com.ercanbeyen.studentservice.mapper;
 
-import com.ercanbeyen.studentservice.dto.StudentDto;
+import com.ercanbeyen.servicecommon.client.contract.StudentDto;
 import com.ercanbeyen.studentservice.entity.Student;
 import org.mapstruct.Mapper;
 

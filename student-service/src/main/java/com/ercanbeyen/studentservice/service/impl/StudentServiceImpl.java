@@ -2,7 +2,7 @@ package com.ercanbeyen.studentservice.service.impl;
 
 import com.ercanbeyen.servicecommon.client.SchoolServiceClient;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
-import com.ercanbeyen.studentservice.dto.StudentDto;
+import com.ercanbeyen.servicecommon.client.contract.StudentDto;
 import com.ercanbeyen.studentservice.entity.Student;
 import com.ercanbeyen.studentservice.mapper.StudentMapper;
 import com.ercanbeyen.studentservice.repository.StudentRepository;
