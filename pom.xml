@@ -30,9 +30,10 @@
 		<module>config-server</module>
 		<module>service-parent</module>
 		<module>service-common</module>
-		<module>school-service</module>
-		<module>student-service</module>
 		<module>exam-service</module>
+		<module>student-service</module>
+		<module>school-service</module>
+		<module>notification-service</module>
 	</modules>
 
 	<dependencyManagement>

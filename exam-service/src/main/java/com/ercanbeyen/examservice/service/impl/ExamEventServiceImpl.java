@@ -5,6 +5,7 @@ import com.ercanbeyen.examservice.entity.Exam;
 import com.ercanbeyen.examservice.entity.ExamEvent;
 import com.ercanbeyen.examservice.mapper.ExamEventMapper;
 import com.ercanbeyen.examservice.repository.ExamEventRepository;
+import com.ercanbeyen.examservice.service.ExamEventNotificationService;
 import com.ercanbeyen.examservice.service.ExamEventService;
 import com.ercanbeyen.examservice.service.ExamService;
 import com.ercanbeyen.servicecommon.client.SchoolServiceClient;
@@ -30,11 +31,17 @@ public class ExamEventServiceImpl implements ExamEventService {
     private final ExamService examService;
     private final SchoolServiceClient schoolServiceClient;
     private final StudentServiceClient studentServiceClient;
+    private final ExamEventNotificationService examEventNotificationService;
 
     @Override
     public ExamEventDto createExamEvent(ExamEventDto request) {
-        ExamEvent examEvent = constructExamEvent(null, request);
-        return examEventMapper.entityToDto(examEventRepository.save(examEvent));
+        ExamEvent constructExamEvent = constructExamEvent(null, request);
+        ExamEvent savedExamEvent = examEventRepository.save(constructExamEvent);
+
+        ExamEventDto examEventDto = examEventMapper.entityToDto(savedExamEvent);
+        examEventNotificationService.sendToQueue(examEventDto);
+
+        return examEventDto;
     }
 
     @Override

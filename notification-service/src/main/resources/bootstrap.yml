@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: NOTIFICATION-SERVICE
+  cloud:
+    config:
+      profile: native
+      uri: http://localhost:8888
