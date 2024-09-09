@@ -83,6 +83,12 @@ public class ExamEventServiceImpl implements ExamEventService {
 
         Exam exam = examService.findById(request.examId());
         ResponseEntity<StudentDto> studentResponse = studentServiceClient.getStudent(request.studentId());
+        log.info("Student Response: {}", studentResponse);
+
+        if (Optional.ofNullable(Objects.requireNonNull(studentResponse.getBody()).id()).isEmpty()) {
+            log.error("Fallback method of getStudent has worked. Student id is {}", studentResponse.getBody().id()); // student id must be null
+            throw new RuntimeException(String.format("Student %s is not found", request.studentId()));
+        }
 
         Integer requestedSchoolId = request.schoolId();
 
