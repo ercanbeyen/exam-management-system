@@ -31,7 +31,7 @@
 		<module>service-parent</module>
 		<module>service-common</module>
 		<module>exam-service</module>
-		<module>student-service</module>
+		<module>candidate-service</module>
 		<module>school-service</module>
 		<module>notification-service</module>
 	</modules>

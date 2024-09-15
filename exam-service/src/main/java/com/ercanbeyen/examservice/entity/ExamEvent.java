@@ -12,7 +12,7 @@ public class ExamEvent {
     private String id;
     @ManyToOne
     private Exam exam;
-    private String studentId;
+    private String candidateId;
     private Integer schoolId;
     private String classroomId;
 }

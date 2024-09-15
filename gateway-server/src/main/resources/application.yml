@@ -15,10 +15,10 @@ spring:
           uri: lb://SCHOOL-SERVICE
           predicates:
             - Path=/schools/**, /classrooms/**
-        - id: STUDENT-SERVICE
-          uri: lb://STUDENT-SERVICE
+        - id: CANDIDATE-SERVICE
+          uri: lb://CANDIDATE-SERVICE
           predicates:
-            - Path=/students/**
+            - Path=/candidates/**
         - id: NOTIFICATION-SERVICE
           uri: lb://NOTIFICATION-SERVICE
           predicates:
