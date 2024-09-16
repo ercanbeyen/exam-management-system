@@ -67,14 +67,14 @@ public class CandidateServiceImpl implements CandidateService {
     @Override
     public String deleteCandidate(String id) {
         candidateRepository.deleteById(id);
-        return "Candidate " + id + " is successfully deleted";
+        return String.format("Candidate %s is successfully deleted", id);
     }
 
     private Candidate findById(String id) {
         Candidate candidate = candidateRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Candidate is not found"));
 
-        log.info("Candidate is found");
+        log.info("Candidate {} is found", id);
 
         return candidate;
     }

@@ -1,6 +1,8 @@
 package com.ercanbeyen.examservice.service.impl;
 
 import com.ercanbeyen.examservice.dto.ExamEventDto;
+import com.ercanbeyen.examservice.dto.ExamLocationDto;
+import com.ercanbeyen.examservice.embeddable.ExamLocation;
 import com.ercanbeyen.examservice.entity.Exam;
 import com.ercanbeyen.examservice.entity.ExamEvent;
 import com.ercanbeyen.examservice.mapper.ExamEventMapper;
@@ -65,7 +67,7 @@ public class ExamEventServiceImpl implements ExamEventService {
     public String deleteExamEvent(String id) {
         ExamEvent examEvent = findById(id);
         examEventRepository.delete(examEvent);
-        return "Exam event " + id + " is successfully deleted";
+        return String.format("Exam event %s is successfully deleted", id);
     }
 
     @Override
@@ -88,26 +90,25 @@ public class ExamEventServiceImpl implements ExamEventService {
         }
 
         Exam exam = examService.findById(request.examId());
+        ExamLocationDto requestedLocation = request.location();
 
-        Integer requestedSchoolId = request.schoolId();
-
-        ResponseEntity<SchoolDto> schoolResponse = schoolServiceClient.getSchool(requestedSchoolId);
+        ResponseEntity<SchoolDto> schoolResponse = schoolServiceClient.getSchool(requestedLocation.schoolId());
         SchoolDto schoolDto = schoolResponse.getBody();
 
         assert schoolDto != null;
-        String requestedClassroomId = request.classroomId();
 
         boolean classroomIdExists = schoolDto.classroomIds()
                 .stream()
-                .anyMatch(classroomId -> classroomId.equals(requestedClassroomId));
+                .anyMatch(classroomId -> classroomId.equals(requestedLocation.classroomId()));
 
         if (!classroomIdExists) {
-            throw new RuntimeException(String.format("Classroom %s does not found inside school %d", requestedClassroomId, requestedSchoolId));
+            throw new RuntimeException(String.format("Classroom %s does not found inside school %d", requestedLocation.classroomId(), requestedLocation.schoolId()));
         }
 
+        ExamLocation examLocation = new ExamLocation(requestedLocation.schoolId(), requestedLocation.classroomId());
+
         examEvent.setExam(exam);
-        examEvent.setSchoolId(requestedSchoolId);
-        examEvent.setClassroomId(requestedClassroomId);
+        examEvent.setLocation(examLocation);
 
         return examEvent;
     }

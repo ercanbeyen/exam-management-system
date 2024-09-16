@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Service
 public class ExamEventNotificationImpl implements ExamEventNotificationService {
     private final StreamBridge streamBridge;
+
     @Override
     public void sendToQueue(ExamEventDto examEventDto) {
         String message = String.format("Exam event %s is for exam %s", examEventDto.id(), examEventDto.examId());

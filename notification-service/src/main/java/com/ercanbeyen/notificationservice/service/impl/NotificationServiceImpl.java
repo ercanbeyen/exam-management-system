@@ -47,7 +47,7 @@ public class NotificationServiceImpl implements NotificationService {
     public String deleteNotification(String id) {
         Notification notification = findById(id);
         notificationRepository.delete(notification);
-        return "Notification " + id + " is successfully deleted";
+        return String.format("Notification %s is successfully deleted", id);
     }
 
     private Notification findById(String id) {

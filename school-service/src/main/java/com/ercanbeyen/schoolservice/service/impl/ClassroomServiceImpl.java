@@ -62,12 +62,12 @@ public class ClassroomServiceImpl implements ClassroomService {
     public String deleteClassroom(String id) {
         Classroom classroom = findById(id);
         classroomRepository.delete(classroom);
-        return "Classroom " + id + " is successfully deleted";
+        return String.format("Classroom %s is successfully deleted", id);
     }
 
     private Classroom findById(String id) {
         Classroom classroom = classroomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Classroom is not found"));
+                .orElseThrow(() -> new RuntimeException(String.format("Classroom %s is not found", id)));
 
         log.info("Classroom {} is found", id);
 

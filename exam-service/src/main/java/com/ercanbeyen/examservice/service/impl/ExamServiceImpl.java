@@ -1,5 +1,6 @@
 package com.ercanbeyen.examservice.service.impl;
 
+import com.ercanbeyen.examservice.embeddable.ExamTime;
 import com.ercanbeyen.examservice.mapper.ExamMapper;
 import com.ercanbeyen.examservice.dto.ExamDto;
 import com.ercanbeyen.examservice.repository.ExamRepository;
@@ -28,11 +29,10 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public ExamDto updateExam(String id, ExamDto request) {
         Exam exam = findById(id);
+        ExamTime examTime = new ExamTime(request.time().date(), request.time().startedAt(), request.time().finishedAt());
 
         exam.setSubject(request.subject());
-        exam.getTime().setDate(request.time().date());
-        exam.getTime().setStartedAt(request.time().startedAt());
-        exam.getTime().setFinishedAt(request.time().finishedAt());
+        exam.setTime(examTime);
 
         return examMapper.entityToDto(examRepository.save(exam));
     }
@@ -55,13 +55,13 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public String deleteExam(String id) {
         examRepository.deleteById(id);
-        return "Exam " + id + " is successfully deleted";
+        return String.format("Exam %s is successfully deleted", id);
     }
 
     @Override
     public Exam findById(String id) {
         Exam exam = examRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Exam is not found"));
+                .orElseThrow(() -> new RuntimeException(String.format("Exam %s is not found", id)));
 
         log.info("Exam {} is found", id);
 

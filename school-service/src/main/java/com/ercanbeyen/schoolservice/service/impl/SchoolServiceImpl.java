@@ -57,15 +57,15 @@ public class SchoolServiceImpl implements SchoolService {
     @Override
     public String deleteSchool(Integer id) {
         schoolRepository.deleteById(id);
-        return "School " + id + " is successfully deleted";
+        return String.format("School %d is successfully deleted", id);
     }
 
     @Override
     public School findById(Integer id) {
         School school = schoolRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("School is not found"));
+                .orElseThrow(() -> new RuntimeException(String.format("School %d is not found", id)));
 
-        log.info("School is found");
+        log.info("School {} is found", id);
 
         return school;
     }

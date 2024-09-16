@@ -1,5 +1,6 @@
 package com.ercanbeyen.examservice.entity;
 
+import com.ercanbeyen.examservice.embeddable.ExamLocation;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,8 +16,8 @@ public class ExamEvent {
     @ManyToOne
     private Exam exam;
     private String candidateId;
-    private Integer schoolId;
-    private String classroomId;
+    @Embedded
+    private ExamLocation location;
     @OneToMany(mappedBy = "examEvent")
     private List<ExamRegistration> examRegistrations;
 }

@@ -59,7 +59,7 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     public String deleteExamRegistration(String id) {
         ExamRegistration examRegistration = findById(id);
         examRegistrationRepository.delete(examRegistration);
-        return "Exam repository " + id + " is successfully deleted";
+        return String.format("Exam registration %s is successfully deleted", id);
     }
 
     private ExamRegistration findById(String id) {
