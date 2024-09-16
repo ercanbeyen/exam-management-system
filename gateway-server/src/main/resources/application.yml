@@ -10,7 +10,7 @@ spring:
         - id: EXAM-SERVICE
           uri: lb://EXAM-SERVICE
           predicates:
-            - Path=/exams/**, /exam-events/**
+            - Path=/exams/**, /exam-events/**, /exam-registrations
         - id: SCHOOL-SERVICE
           uri: lb://SCHOOL-SERVICE
           predicates:

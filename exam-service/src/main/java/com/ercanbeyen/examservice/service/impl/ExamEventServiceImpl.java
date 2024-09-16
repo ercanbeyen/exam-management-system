@@ -9,9 +9,7 @@ import com.ercanbeyen.examservice.service.ExamEventNotificationService;
 import com.ercanbeyen.examservice.service.ExamEventService;
 import com.ercanbeyen.examservice.service.ExamService;
 import com.ercanbeyen.servicecommon.client.SchoolServiceClient;
-import com.ercanbeyen.servicecommon.client.CandidateServiceClient;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
-import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -30,7 +27,6 @@ public class ExamEventServiceImpl implements ExamEventService {
     private final ExamEventMapper examEventMapper;
     private final ExamService examService;
     private final SchoolServiceClient schoolServiceClient;
-    private final CandidateServiceClient candidateServiceClient;
     private final ExamEventNotificationService examEventNotificationService;
 
     @Override
@@ -72,6 +68,16 @@ public class ExamEventServiceImpl implements ExamEventService {
         return "Exam event " + id + " is successfully deleted";
     }
 
+    @Override
+    public ExamEvent findById(String id) {
+        ExamEvent examEvent = examEventRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(String.format("Exam event %s is not found", id)));
+
+        log.info("Exam event {} is found", id);
+
+        return examEvent;
+    }
+
     private ExamEvent constructExamEvent(String id, ExamEventDto request) {
         ExamEvent examEvent;
 
@@ -82,13 +88,6 @@ public class ExamEventServiceImpl implements ExamEventService {
         }
 
         Exam exam = examService.findById(request.examId());
-        ResponseEntity<CandidateDto> candidateResponse = candidateServiceClient.getCandidate(request.candidateId());
-        log.info("Candidate Response: {}", candidateResponse);
-
-        if (Optional.ofNullable(Objects.requireNonNull(candidateResponse.getBody()).id()).isEmpty()) {
-            log.error("Fallback method of getStudent has worked. Candidate id is {}", candidateResponse.getBody().id()); // candidate id must be null
-            throw new RuntimeException(String.format("Candidate %s is not found", request.candidateId()));
-        }
 
         Integer requestedSchoolId = request.schoolId();
 
@@ -107,18 +106,8 @@ public class ExamEventServiceImpl implements ExamEventService {
         }
 
         examEvent.setExam(exam);
-        examEvent.setCandidateId(Objects.requireNonNull(candidateResponse.getBody()).id());
         examEvent.setSchoolId(requestedSchoolId);
         examEvent.setClassroomId(requestedClassroomId);
-
-        return examEvent;
-    }
-
-    private ExamEvent findById(String id) {
-        ExamEvent examEvent = examEventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(String.format("Exam event %s is not found", id)));
-
-        log.info("Exam event {} is found", id);
 
         return examEvent;
     }
