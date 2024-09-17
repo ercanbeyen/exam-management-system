@@ -21,6 +21,7 @@
 		<spring-cloud.version>2023.0.3</spring-cloud.version>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<service-common.version>0.0.1-SNAPSHOT</service-common.version>
+		<spring-boot-admin.version>3.3.3</spring-boot-admin.version>
 	</properties>
 
 	<dependencies>
@@ -77,7 +78,23 @@
 			<artifactId>service-common</artifactId>
 			<version>${service-common.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>de.codecentric</groupId>
+			<artifactId>spring-boot-admin-starter-client</artifactId>
+		</dependency>
 	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>de.codecentric</groupId>
+				<artifactId>spring-boot-admin-dependencies</artifactId>
+				<version>${spring-boot-admin.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<plugins>

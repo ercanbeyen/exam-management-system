@@ -26,8 +26,9 @@
 	<modules>
 		<module>eureka-server</module>
 		<module>gateway-server</module>
-		<module>zipkin-server</module>
 		<module>config-server</module>
+		<module>zipkin-server</module>
+		<module>admin-server</module>
 		<module>service-parent</module>
 		<module>service-common</module>
 		<module>exam-service</module>
