@@ -10,19 +10,75 @@ spring:
         - id: EXAM-SERVICE
           uri: lb://EXAM-SERVICE
           predicates:
-            - Path=/exams/**, /exam-events/**, /exam-registrations
+            - Path=/exams/**, /exam-events/**, /exam-registrations/**
+          filters:
+            - AddRequestHeader=X-Client,web
+            - AddResponseHeader=X-Type,inorganic
+            - name: Retry
+              args:
+                retries: 3
+                methods: GET
+                backoff:
+                  firstBackoff: 50ms
+                  maxBackoff: 500ms
+            - name: CircuitBreaker
+              args:
+                name: EXAM-SERVICE
+                fallbackUri: forward:/fb/exam
         - id: SCHOOL-SERVICE
           uri: lb://SCHOOL-SERVICE
           predicates:
             - Path=/schools/**, /classrooms/**
+          filters:
+            - AddRequestHeader=X-Client,web
+            - AddResponseHeader=X-Type,inorganic
+            - name: Retry
+              args:
+                retries: 3
+                methods: GET
+                backoff:
+                  firstBackoff: 50ms
+                  maxBackoff: 500ms
+            - name: CircuitBreaker
+              args:
+                name: SCHOOL-SERVICE
+                fallbackUri: forward:/fb/school
         - id: CANDIDATE-SERVICE
           uri: lb://CANDIDATE-SERVICE
           predicates:
             - Path=/candidates/**
+          filters:
+            - AddRequestHeader=X-Client,web
+            - AddResponseHeader=X-Type,inorganic
+            - name: Retry
+              args:
+                retries: 3
+                methods: GET
+                backoff:
+                  firstBackoff: 50ms
+                  maxBackoff: 500ms
+            - name: CircuitBreaker
+              args:
+                name: CANDIDATE-SERVICE
+                fallbackUri: forward:/fb/candidate
         - id: NOTIFICATION-SERVICE
           uri: lb://NOTIFICATION-SERVICE
           predicates:
             - Path=/notifications/**
+          filters:
+            - AddRequestHeader=X-Client,web
+            - AddResponseHeader=X-Type,inorganic
+            - name: Retry
+              args:
+                retries: 3
+                methods: GET
+                backoff:
+                  firstBackoff: 50ms
+                  maxBackoff: 500ms
+            - name: CircuitBreaker
+              args:
+                name: NOTIFICATION-SERVICE
+                fallbackUri: forward:/fb/notification
 
 eureka:
   client:
@@ -32,3 +88,41 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     hostname: localhost
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      EXAM-SERVICE:
+        slidingWindowSize: 10                     # unit request
+        permittedNumberOfCallsInHalfOpenState: 5  # unit request
+        failureRateThreshold: 50                  # percent
+        waitDurationInOpenState: 10000            # 10 seconds
+        registerHealthIndicator: true
+      SCHOOL-SERVICE:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+        registerHealthIndicator: true
+      CANDIDATE-SERVICE:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+        registerHealthIndicator: true
+      NOTIFICATION-SERVICE:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+        registerHealthIndicator: true
+  timelimiter:
+    instances:
+      EXAM-SERVICE:
+        timeoutDuration: 2s
+      SCHOOL-SERVICE:
+        timeoutDuration: 2s
+      CANDIDATE-SERVICE:
+        timeoutDuration: 2s
+      NOTIFICATION-SERVICE:
+        timeoutDuration: 2s

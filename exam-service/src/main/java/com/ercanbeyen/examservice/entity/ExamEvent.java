@@ -15,7 +15,6 @@ public class ExamEvent {
     private String id;
     @ManyToOne
     private Exam exam;
-    private String candidateId;
     @Embedded
     private ExamLocation location;
     @OneToMany(mappedBy = "examEvent")
