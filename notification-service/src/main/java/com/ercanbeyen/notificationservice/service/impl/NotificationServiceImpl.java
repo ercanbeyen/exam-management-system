@@ -1,5 +1,6 @@
 package com.ercanbeyen.notificationservice.service.impl;
 
+import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.messaging.NotificationDto;
 import com.ercanbeyen.notificationservice.entity.Notification;
 import com.ercanbeyen.notificationservice.mapper.NotificationMapper;
@@ -52,6 +53,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     private Notification findById(String id) {
         return notificationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(String.format("Notification %s is not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Notification %s is not found", id)));
     }
 }

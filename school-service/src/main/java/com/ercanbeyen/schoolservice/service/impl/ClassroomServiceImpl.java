@@ -7,6 +7,7 @@ import com.ercanbeyen.schoolservice.mapper.ClassroomMapper;
 import com.ercanbeyen.schoolservice.repository.ClassroomRepository;
 import com.ercanbeyen.schoolservice.service.ClassroomService;
 import com.ercanbeyen.schoolservice.service.SchoolService;
+import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -67,7 +68,7 @@ public class ClassroomServiceImpl implements ClassroomService {
 
     private Classroom findById(String id) {
         Classroom classroom = classroomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(String.format("Classroom %s is not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Classroom %s is not found", id)));
 
         log.info("Classroom {} is found", id);
 

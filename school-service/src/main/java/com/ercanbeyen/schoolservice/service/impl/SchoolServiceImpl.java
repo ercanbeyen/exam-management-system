@@ -5,6 +5,7 @@ import com.ercanbeyen.schoolservice.entity.School;
 import com.ercanbeyen.schoolservice.mapper.SchoolMapper;
 import com.ercanbeyen.schoolservice.repository.SchoolRepository;
 import com.ercanbeyen.schoolservice.service.SchoolService;
+import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -63,7 +64,7 @@ public class SchoolServiceImpl implements SchoolService {
     @Override
     public School findById(Integer id) {
         School school = schoolRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(String.format("School %d is not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("School %d is not found", id)));
 
         log.info("School {} is found", id);
 

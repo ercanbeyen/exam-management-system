@@ -7,6 +7,7 @@ import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
 import com.ercanbeyen.candidateservice.mapper.CandidateMapper;
 import com.ercanbeyen.candidateservice.repository.CandidateRepository;
 import com.ercanbeyen.candidateservice.service.CandidateService;
+import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -26,10 +26,11 @@ public class CandidateServiceImpl implements CandidateService {
 
     @Override
     public CandidateDto createCandidate(CandidateDto request) {
-        ResponseEntity<SchoolDto> schoolDto = schoolServiceClient.getSchool(request.schoolId());
+        ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(request.schoolId());
+        log.info("School Service Response: {}", schoolServiceResponse);
 
         Candidate candidate = candidateMapper.dtoToEntity(request);
-        candidate.setSchoolId(Objects.requireNonNull(schoolDto.getBody()).id());
+        candidate.setSchoolId(request.schoolId());
 
         return candidateMapper.entityToDto(candidateRepository.save(candidate));
     }
@@ -38,9 +39,10 @@ public class CandidateServiceImpl implements CandidateService {
     public CandidateDto updateCandidate(String id, CandidateDto request) {
         Candidate candidateInDb = findById(id);
 
-        ResponseEntity<SchoolDto> schoolDto = schoolServiceClient.getSchool(request.schoolId());
+        ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(request.schoolId());
+        log.info("School Service Response: {}", schoolServiceResponse);
 
-        candidateInDb.setSchoolId(Objects.requireNonNull(schoolDto.getBody()).id());
+        candidateInDb.setSchoolId(request.schoolId());
         candidateInDb.setName(request.name());
         candidateInDb.setAge(request.age());
         candidateInDb.setGender(request.gender());
@@ -72,7 +74,7 @@ public class CandidateServiceImpl implements CandidateService {
 
     private Candidate findById(String id) {
         Candidate candidate = candidateRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Candidate is not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Candidate %s is not found", id)));
 
         log.info("Candidate {} is found", id);
 

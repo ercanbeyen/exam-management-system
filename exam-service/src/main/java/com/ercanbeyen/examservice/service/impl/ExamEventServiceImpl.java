@@ -12,6 +12,7 @@ import com.ercanbeyen.examservice.service.ExamEventService;
 import com.ercanbeyen.examservice.service.ExamService;
 import com.ercanbeyen.servicecommon.client.SchoolServiceClient;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
+import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -73,7 +74,7 @@ public class ExamEventServiceImpl implements ExamEventService {
     @Override
     public ExamEvent findById(String id) {
         ExamEvent examEvent = examEventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(String.format("Exam event %s is not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Exam event %s is not found", id)));
 
         log.info("Exam event {} is found", id);
 
@@ -92,8 +93,8 @@ public class ExamEventServiceImpl implements ExamEventService {
         Exam exam = examService.findById(request.examId());
         ExamLocationDto requestedLocation = request.location();
 
-        ResponseEntity<SchoolDto> schoolResponse = schoolServiceClient.getSchool(requestedLocation.schoolId());
-        SchoolDto schoolDto = schoolResponse.getBody();
+        ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(requestedLocation.schoolId());
+        SchoolDto schoolDto = schoolServiceResponse.getBody();
 
         assert schoolDto != null;
 
@@ -102,7 +103,7 @@ public class ExamEventServiceImpl implements ExamEventService {
                 .anyMatch(classroomId -> classroomId.equals(requestedLocation.classroomId()));
 
         if (!classroomIdExists) {
-            throw new RuntimeException(String.format("Classroom %s does not found inside school %d", requestedLocation.classroomId(), requestedLocation.schoolId()));
+            throw new ResourceNotFoundException(String.format("Classroom %s does not found inside school %d", requestedLocation.classroomId(), requestedLocation.schoolId()));
         }
 
         ExamLocation examLocation = new ExamLocation(requestedLocation.schoolId(), requestedLocation.classroomId());

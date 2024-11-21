@@ -9,6 +9,7 @@ import com.ercanbeyen.examservice.service.ExamEventService;
 import com.ercanbeyen.examservice.service.ExamRegistrationService;
 import com.ercanbeyen.servicecommon.client.CandidateServiceClient;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
+import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -64,7 +64,7 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
 
     private ExamRegistration findById(String id) {
         ExamRegistration examRegistration = examRegistrationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(String.format("Exam registration %s is not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Exam registration %s is not found", id)));
 
         log.info("Exam registration {} is found", id);
 
@@ -82,13 +82,8 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
 
         ExamEvent examEvent = examEventService.findById(request.examEventId());
 
-        ResponseEntity<CandidateDto> candidateResponse = candidateServiceClient.getCandidate(request.candidateId());
-        log.info("Candidate Response: {}", candidateResponse);
-
-        if (Optional.ofNullable(Objects.requireNonNull(candidateResponse.getBody()).id()).isEmpty()) {
-            log.error("Fallback method of getStudent has worked. Candidate id is {}", candidateResponse.getBody().id()); // candidate id must be null
-            throw new RuntimeException(String.format("Candidate %s is not found", request.candidateId()));
-        }
+        ResponseEntity<CandidateDto> candidateServiceResponse = candidateServiceClient.getCandidate(request.candidateId());
+        log.info("Candidate Service Response: {}", candidateServiceResponse);
 
         examRegistration.setExamEvent(examEvent);
         examRegistration.setCandidateId(request.candidateId());

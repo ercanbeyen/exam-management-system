@@ -6,6 +6,7 @@ import com.ercanbeyen.examservice.dto.ExamDto;
 import com.ercanbeyen.examservice.repository.ExamRepository;
 import com.ercanbeyen.examservice.service.ExamService;
 import com.ercanbeyen.examservice.entity.Exam;
+import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -61,7 +62,7 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public Exam findById(String id) {
         Exam exam = examRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(String.format("Exam %s is not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Exam %s is not found", id)));
 
         log.info("Exam {} is found", id);
 

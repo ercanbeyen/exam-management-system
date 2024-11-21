@@ -3,11 +3,13 @@ package com.ercanbeyen.schoolservice.controller;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.schoolservice.service.SchoolService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/schools")
 @RequiredArgsConstructor
@@ -26,7 +28,9 @@ public class SchoolController {
 
     @GetMapping("/{id}")
     public ResponseEntity<SchoolDto> getSchool(@PathVariable int id) {
-        return ResponseEntity.ok(schoolService.getSchool(id));
+        SchoolDto school = schoolService.getSchool(id);
+        log.info("School is successfully fetched");
+        return ResponseEntity.ok(school);
     }
 
     @GetMapping
