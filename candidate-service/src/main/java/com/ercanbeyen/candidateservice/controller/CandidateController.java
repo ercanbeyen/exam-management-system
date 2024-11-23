@@ -26,7 +26,7 @@ public class CandidateController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CandidateDto> getCandidate(@PathVariable String id) {
-        return ResponseEntity.ok(candidateService.getCandidates(id));
+        return ResponseEntity.ok(candidateService.getCandidate(id));
     }
 
     @GetMapping

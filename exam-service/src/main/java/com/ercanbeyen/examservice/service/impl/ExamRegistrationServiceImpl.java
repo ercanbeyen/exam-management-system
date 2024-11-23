@@ -6,16 +6,17 @@ import com.ercanbeyen.examservice.entity.ExamRegistration;
 import com.ercanbeyen.examservice.mapper.ExamRegistrationMapper;
 import com.ercanbeyen.examservice.repository.ExamRegistrationRepository;
 import com.ercanbeyen.examservice.service.ExamEventService;
+import com.ercanbeyen.examservice.service.ExamRegistrationNotificationService;
 import com.ercanbeyen.examservice.service.ExamRegistrationService;
 import com.ercanbeyen.servicecommon.client.CandidateServiceClient;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
+import com.ercanbeyen.servicecommon.client.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,11 +28,17 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     private final ExamRegistrationMapper examRegistrationMapper;
     private final ExamEventService examEventService;
     private final CandidateServiceClient candidateServiceClient;
+    private final ExamRegistrationNotificationService examRegistrationNotificationService;
 
     @Override
     public ExamRegistrationDto createExamRegistration(ExamRegistrationDto request) {
         ExamRegistration examRegistration = constructExamRegistration(null, request);
-        return examRegistrationMapper.entityToDto(examRegistrationRepository.save(examRegistration));
+        ExamRegistration savedExamRegistration = examRegistrationRepository.save(examRegistration);
+
+        ExamRegistrationDto examRegistrationDto = examRegistrationMapper.entityToDto(savedExamRegistration);
+        examRegistrationNotificationService.sendToQueue(examRegistrationDto);
+
+        return examRegistrationDto;
     }
 
     @Override
@@ -47,12 +54,10 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
 
     @Override
     public List<ExamRegistrationDto> getExamRegistrations() {
-        List<ExamRegistrationDto> examRegistrationDtos = new ArrayList<>();
-
-        examRegistrationRepository.findAll()
-                .forEach(examRegistration -> examRegistrationDtos.add(examRegistrationMapper.entityToDto(examRegistration)));
-
-        return examRegistrationDtos;
+        return examRegistrationRepository.findAll()
+                .stream()
+                .map(examRegistrationMapper::entityToDto)
+                .toList();
     }
 
     @Override
@@ -66,24 +71,20 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         ExamRegistration examRegistration = examRegistrationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Exam registration %s is not found", id)));
 
-        log.info("Exam registration {} is found", id);
+        log.info(LogMessage.RESOURCE_FOUND, "Exam registration", id);
 
         return examRegistration;
     }
 
     private ExamRegistration constructExamRegistration(String id, ExamRegistrationDto request) {
-        ExamRegistration examRegistration;
-
-        if (Optional.ofNullable(id).isPresent()) {
-            examRegistration = findById(id);
-        } else {
-            examRegistration = examRegistrationMapper.dtoToEntity(request);
-        }
+        ExamRegistration examRegistration = Optional.ofNullable(id).isPresent()
+                ? findById(id)
+                : examRegistrationMapper.dtoToEntity(request);
 
         ExamEvent examEvent = examEventService.findById(request.examEventId());
 
         ResponseEntity<CandidateDto> candidateServiceResponse = candidateServiceClient.getCandidate(request.candidateId());
-        log.info("Candidate Service Response: {}", candidateServiceResponse);
+        log.info(LogMessage.CLIENT_SERVICE_RESPONSE, "Candidate", candidateServiceResponse);
 
         examRegistration.setExamEvent(examEvent);
         examRegistration.setCandidateId(request.candidateId());

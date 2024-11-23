@@ -10,6 +10,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class ExamServiceGlobalExceptionHandler {
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequestException(Exception exception) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, GlobalErrorCode.EXAM_BAD_REQUEST_ERROR, exception.getMessage());
+        log.error("ExamServiceGlobalExceptionHandler::handleBadRequestException exception caught {}", exception.getMessage());
+        return ResponseEntity.badRequest()
+                .body(errorResponse);
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(Exception exception) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, GlobalErrorCode.EXAM_NOT_FOUND_ERROR, exception.getMessage());

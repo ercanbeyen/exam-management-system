@@ -1,6 +1,7 @@
 package com.ercanbeyen.notificationservice.config;
 
 import com.ercanbeyen.notificationservice.service.NotificationService;
+import com.ercanbeyen.servicecommon.client.exception.InternalServerErrorException;
 import com.ercanbeyen.servicecommon.client.messaging.NotificationDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,11 +24,16 @@ public class KafkaConfig {
             try {
                 Thread.sleep(1500);
             } catch (InterruptedException exception) {
-                throw new RuntimeException(exception.getMessage());
+                log.error("Threw Exception: {}", exception.getClass());
+                Thread.currentThread().interrupt();
+                throw new InternalServerErrorException(exception.getMessage());
+            } catch (Exception exception) {
+                log.error("Unknown exception: {}", exception.getClass());
+                Thread.currentThread().interrupt();
+                throw new InternalServerErrorException(exception.getMessage());
             }
 
             log.info("Process is in producer stage");
-
             return request;
         };
     }
@@ -44,9 +50,9 @@ public class KafkaConfig {
     @Bean
     public Consumer<NotificationDto> consumerBinding() {
         return notificationDto -> {
+            log.info("Process is in consumer stage");
             NotificationDto createdNotification = notificationService.createNotification(notificationDto);
             log.info("Notification is created at {}", createdNotification.createdAt());
-            log.info("Process is in consumer stage");
         };
     }
 }

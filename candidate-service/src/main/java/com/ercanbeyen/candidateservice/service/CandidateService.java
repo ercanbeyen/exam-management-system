@@ -7,7 +7,7 @@ import java.util.List;
 public interface CandidateService {
     CandidateDto createCandidate(CandidateDto request);
     CandidateDto updateCandidate(String id, CandidateDto request);
-    CandidateDto getCandidates(String id);
+    CandidateDto getCandidate(String id);
     List<CandidateDto> getCandidates();
     String deleteCandidate(String id);
 }

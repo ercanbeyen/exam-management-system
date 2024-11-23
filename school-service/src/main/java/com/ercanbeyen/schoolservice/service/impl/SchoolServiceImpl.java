@@ -6,11 +6,11 @@ import com.ercanbeyen.schoolservice.mapper.SchoolMapper;
 import com.ercanbeyen.schoolservice.repository.SchoolRepository;
 import com.ercanbeyen.schoolservice.service.SchoolService;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
+import com.ercanbeyen.servicecommon.client.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -45,14 +45,10 @@ public class SchoolServiceImpl implements SchoolService {
 
     @Override
     public List<SchoolDto> getSchools() {
-        List<SchoolDto> schoolDtos = new ArrayList<>();
-
-        schoolRepository.findAll()
-                .forEach(school -> schoolDtos.add(schoolMapper.entityToDto(school)));
-
-        log.info("Schools are fetched");
-
-        return schoolDtos;
+        return schoolRepository.findAll()
+                .stream()
+                .map(schoolMapper::entityToDto)
+                .toList();
     }
 
     @Override
@@ -66,7 +62,7 @@ public class SchoolServiceImpl implements SchoolService {
         School school = schoolRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("School %d is not found", id)));
 
-        log.info("School {} is found", id);
+        log.info(LogMessage.RESOURCE_FOUND, "School", id);
 
         return school;
     }

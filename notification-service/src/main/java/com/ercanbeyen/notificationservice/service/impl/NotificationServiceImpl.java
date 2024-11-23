@@ -1,6 +1,7 @@
 package com.ercanbeyen.notificationservice.service.impl;
 
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
+import com.ercanbeyen.servicecommon.client.logging.LogMessage;
 import com.ercanbeyen.servicecommon.client.messaging.NotificationDto;
 import com.ercanbeyen.notificationservice.entity.Notification;
 import com.ercanbeyen.notificationservice.mapper.NotificationMapper;
@@ -10,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -34,14 +34,10 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public List<NotificationDto> getNotifications() {
-        List<NotificationDto> notificationDtos = new ArrayList<>();
-
-        notificationRepository.findAll()
-                .forEach(notification -> notificationDtos.add(notificationMapper.entityToDto(notification)));
-
-        log.info("Notifications are successfully fetched");
-
-        return notificationDtos;
+        return notificationRepository.findAll()
+                .stream()
+                .map(notificationMapper::entityToDto)
+                .toList();
     }
 
     @Override
@@ -52,7 +48,11 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private Notification findById(String id) {
-        return notificationRepository.findById(id)
+        Notification candidate = notificationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Notification %s is not found", id)));
+
+        log.info(LogMessage.RESOURCE_FOUND, "Notification", id);
+
+        return candidate;
     }
 }

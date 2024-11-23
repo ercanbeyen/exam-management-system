@@ -13,12 +13,12 @@ import com.ercanbeyen.examservice.service.ExamService;
 import com.ercanbeyen.servicecommon.client.SchoolServiceClient;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
+import com.ercanbeyen.servicecommon.client.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,12 +56,10 @@ public class ExamEventServiceImpl implements ExamEventService {
 
     @Override
     public List<ExamEventDto> getExamEvents() {
-        List<ExamEventDto> examEventDtos = new ArrayList<>();
-
-        examEventRepository.findAll()
-                .forEach(examEvent -> examEventDtos.add(examEventMapper.entityToDto(examEvent)));
-
-        return examEventDtos;
+        return examEventRepository.findAll()
+                .stream()
+                .map(examEventMapper::entityToDto)
+                .toList();
     }
 
     @Override
@@ -76,19 +74,15 @@ public class ExamEventServiceImpl implements ExamEventService {
         ExamEvent examEvent = examEventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Exam event %s is not found", id)));
 
-        log.info("Exam event {} is found", id);
+        log.info(LogMessage.RESOURCE_FOUND, "Exam event", id);
 
         return examEvent;
     }
 
     private ExamEvent constructExamEvent(String id, ExamEventDto request) {
-        ExamEvent examEvent;
-
-        if (Optional.ofNullable(id).isPresent()) {
-            examEvent = findById(id);
-        } else {
-            examEvent = examEventMapper.dtoToEntity(request);
-        }
+        ExamEvent examEvent = Optional.ofNullable(id).isPresent()
+                ? findById(id)
+                : examEventMapper.dtoToEntity(request);
 
         Exam exam = examService.findById(request.examId());
         ExamLocationDto requestedLocation = request.location();

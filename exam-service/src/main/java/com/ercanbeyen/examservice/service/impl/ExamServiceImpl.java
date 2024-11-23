@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -45,12 +44,10 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public List<ExamDto> getExams() {
-        List<ExamDto> examDtos = new ArrayList<>();
-
-        examRepository.findAll()
-                .forEach(exam -> examDtos.add(examMapper.entityToDto(exam)));
-
-        return examDtos;
+        return examRepository.findAll()
+                .stream()
+                .map(examMapper::entityToDto)
+                .toList();
     }
 
     @Override
