@@ -1,0 +1,54 @@
+server:
+  port: 9898
+
+spring:
+  application:
+    name: AUTH-SERVICE
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/auth_service
+    username: root
+    password: password
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+      properties:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+  zipkin:
+    base-url: http://localhost:9411/
+  boot:
+    admin:
+      client:
+        url: http://localhost:8508
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    hostname: localhost
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+      read-timeout: 60
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+    propagation:
+      type: b3

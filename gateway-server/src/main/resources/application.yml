@@ -6,12 +6,16 @@ spring:
     name: GATEWAY-SERVER
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
       routes:
         - id: EXAM-SERVICE
           uri: lb://EXAM-SERVICE
           predicates:
             - Path=/exams/**, /exam-events/**, /exam-registrations/**
           filters:
+            - AuthenticationFilter=USER
             - AddRequestHeader=X-Client,web
             - AddResponseHeader=X-Type,inorganic
             - name: Retry
@@ -30,6 +34,7 @@ spring:
           predicates:
             - Path=/schools/**, /classrooms/**
           filters:
+            - AuthenticationFilter=USER
             - AddRequestHeader=X-Client,web
             - AddResponseHeader=X-Type,inorganic
             - name: Retry
@@ -48,6 +53,7 @@ spring:
           predicates:
             - Path=/candidates/**
           filters:
+            - AuthenticationFilter=ADMIN
             - AddRequestHeader=X-Client,web
             - AddResponseHeader=X-Type,inorganic
             - name: Retry
@@ -66,6 +72,7 @@ spring:
           predicates:
             - Path=/notifications/**
           filters:
+            - AuthenticationFilter=USER
             - AddRequestHeader=X-Client,web
             - AddResponseHeader=X-Type,inorganic
             - name: Retry
@@ -79,6 +86,10 @@ spring:
               args:
                 name: NOTIFICATION-SERVICE
                 fallbackUri: forward:/fb/notification
+        - id: AUTH-SERVICE
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
 
 eureka:
   client:

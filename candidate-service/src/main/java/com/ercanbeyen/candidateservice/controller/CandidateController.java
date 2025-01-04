@@ -3,7 +3,9 @@ package com.ercanbeyen.candidateservice.controller;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
 import com.ercanbeyen.candidateservice.service.CandidateService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/candidates")
 @RequiredArgsConstructor
+@Slf4j
 public class CandidateController {
     private final CandidateService candidateService;
 
@@ -29,8 +32,10 @@ public class CandidateController {
         return ResponseEntity.ok(candidateService.getCandidate(id));
     }
 
+    //@PreAuthorize("hasAnyAuthority('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<CandidateDto>> getCandidates() {
+    public ResponseEntity<List<CandidateDto>> getCandidates(@RequestHeader("username") String username) {
+        log.info("Username: {}", username);
         return ResponseEntity.ok(candidateService.getCandidates());
     }
 
