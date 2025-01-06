@@ -1,9 +1,17 @@
 package com.ercanbeyen.authservice.service;
 
+import com.ercanbeyen.authservice.dto.request.LoginRequest;
+import com.ercanbeyen.authservice.dto.request.RegistrationRequest;
 import com.ercanbeyen.authservice.entity.UserCredential;
+import com.ercanbeyen.authservice.enums.Role;
+import com.ercanbeyen.authservice.exception.InvalidUserCredentialException;
+import com.ercanbeyen.authservice.exception.UserAlreadyExistException;
 import com.ercanbeyen.authservice.repository.UserCredentialRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,31 +28,62 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final AuthenticationManager authenticationManager;
 
-    public String registerUser(UserCredential userCredential) {
-        String encryptedPassword = passwordEncoder.encode(userCredential.getPassword());
+    public String registerUser(RegistrationRequest request) {
+        boolean userExists = userCredentialRepository.existsByUsername(request.username());
+
+        if (userExists) {
+            throw new UserAlreadyExistException("User already exists");
+        }
+
+        UserCredential userCredential = new UserCredential();
+        String encryptedPassword = passwordEncoder.encode(request.password());
+
+        userCredential.setUsername(request.username());
         userCredential.setPassword(encryptedPassword);
-        userCredential.setRoles(List.of("USER"));
+        userCredential.setEmail(request.email());
+        userCredential.setRoles(List.of(Role.USER.toString()));
+
         userCredentialRepository.save(userCredential);
-        return "User is added to the system";
+
+        return "User is successfully registered";
     }
 
-    public String generateToken(String username) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+    public String loginUser(LoginRequest request) {
+        authenticateUser(request);
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.username());
         log.info("Generate token User Details: {}", userDetails.getUsername());
+
         return jwtService.generateToken(userDetails);
+    }
+
+    private void authenticateUser(LoginRequest request) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
+
+            if (!authentication.isAuthenticated()) {
+                throw new InvalidUserCredentialException("Incorrect username or password");
+            }
+
+            log.info("User is authenticated");
+        } catch (Exception exception) {
+            log.error("Exception: {}. Message: {}", exception.getClass(), exception.getMessage());
+            throw exception;
+        }
     }
 
     public void validateToken(String token) {
         jwtService.validateToken(token);
         log.info("Token is validated");
-
     }
 
     public String updateRoles(String username, List<String> roles) {
         UserCredential userCredential = userCredentialRepository.findByUsername(username).orElseThrow();
         userCredential.setRoles(roles);
         userCredentialRepository.save(userCredential);
+
         return "Roles of user are updated";
     }
 

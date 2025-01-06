@@ -1,13 +1,13 @@
 package com.ercanbeyen.authservice.controller;
 
-import com.ercanbeyen.authservice.dto.AuthRequest;
-import com.ercanbeyen.authservice.entity.UserCredential;
+import com.ercanbeyen.authservice.dto.request.LoginRequest;
+import com.ercanbeyen.authservice.dto.request.RegistrationRequest;
+import com.ercanbeyen.authservice.dto.response.LoginResponse;
+import com.ercanbeyen.authservice.dto.response.MessageResponse;
 import com.ercanbeyen.authservice.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,38 +19,34 @@ import java.util.List;
 @Slf4j
 public class AuthController {
     private final AuthService authService;
-    private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public String addNewUser(@RequestBody UserCredential userCredential) {
-        return authService.registerUser(userCredential);
+    public ResponseEntity<MessageResponse> registerUser(@RequestBody RegistrationRequest request) {
+        String message = authService.registerUser(request);
+        MessageResponse response = new MessageResponse(message);
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/token")
-    public String getToken(@RequestBody AuthRequest authRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-            if (authentication.isAuthenticated()) {
-                return authService.generateToken(authRequest.getUsername());
-            } else {
-                throw new RuntimeException("Invalid access");
-            }
-        } catch (Exception exception) {
-            log.error("Exception message: {}", exception.getMessage());
-            throw exception;
-        }
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest request) {
+        String token = authService.loginUser(request);
+        LoginResponse response = new LoginResponse(token);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/validate")
-    public String validateToken(@RequestParam("token") String token) {
+    public ResponseEntity<MessageResponse> validateToken(@RequestParam("token") String token) {
         log.info("We are in AuthController::validateToken");
         authService.validateToken(token);
-        return "Token is valid";
+        MessageResponse response = new MessageResponse("Token is valid");
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{username}/roles")
-    public String updateRoles(@PathVariable("username") String username, @RequestParam("roles") List<String> roles) {
-        return authService.updateRoles(username, roles);
+    public ResponseEntity<MessageResponse> updateRoles(@PathVariable("username") String username, @RequestParam("roles") List<String> roles) {
+        String message = authService.updateRoles(username, roles);
+        MessageResponse response = new MessageResponse(message);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{username}/roles")
