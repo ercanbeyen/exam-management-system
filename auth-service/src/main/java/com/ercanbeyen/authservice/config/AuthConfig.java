@@ -26,10 +26,7 @@ public class AuthConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.csrf().disable()
                 .authorizeHttpRequests()
-                //.requestMatchers("/auth/register", "/auth/token", "/auth/validate").permitAll()
                 .requestMatchers("/auth/**").permitAll()
-                //.requestMatchers("/candidates/**").hasAnyAuthority("ADMIN")
-                //.requestMatchers("/candidates/**").hasAnyRole("ADMIN")
                 .anyRequest()
                 .authenticated()
                 .and()

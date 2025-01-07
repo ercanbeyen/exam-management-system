@@ -3,7 +3,7 @@ package com.ercanbeyen.authservice.service;
 import com.ercanbeyen.authservice.dto.request.LoginRequest;
 import com.ercanbeyen.authservice.dto.request.RegistrationRequest;
 import com.ercanbeyen.authservice.entity.UserCredential;
-import com.ercanbeyen.authservice.enums.Role;
+import com.ercanbeyen.authservice.constant.enums.Role;
 import com.ercanbeyen.authservice.exception.InvalidUserCredentialException;
 import com.ercanbeyen.authservice.exception.UserAlreadyExistException;
 import com.ercanbeyen.authservice.repository.UserCredentialRepository;
@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -50,28 +51,17 @@ public class AuthService {
         return "User is successfully registered";
     }
 
-    public String loginUser(LoginRequest request) {
+    public Map<String, String> loginUser(LoginRequest request) {
         authenticateUser(request);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.username());
-        log.info("Generate token User Details: {}", userDetails.getUsername());
+        log.info("Login User Details: {}", userDetails.getUsername());
 
-        return jwtService.generateToken(userDetails);
+        return jwtService.generateTokens(userDetails);
     }
 
-    private void authenticateUser(LoginRequest request) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
-
-            if (!authentication.isAuthenticated()) {
-                throw new InvalidUserCredentialException("Incorrect username or password");
-            }
-
-            log.info("User is authenticated");
-        } catch (Exception exception) {
-            log.error("Exception: {}. Message: {}", exception.getClass(), exception.getMessage());
-            throw exception;
-        }
+    public Map<String, String> refreshToken(String token) {
+        return jwtService.refreshToken(token);
     }
 
     public void validateToken(String token) {
@@ -103,5 +93,20 @@ public class AuthService {
 
     public boolean checkRole(String token, String role) {
         return jwtService.hasRole(token, role);
+    }
+
+    private void authenticateUser(LoginRequest request) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
+
+            if (!authentication.isAuthenticated()) {
+                throw new InvalidUserCredentialException("Incorrect username or password");
+            }
+
+            log.info("User is authenticated");
+        } catch (Exception exception) {
+            log.error("Exception: {}. Message: {}", exception.getClass(), exception.getMessage());
+            throw exception;
+        }
     }
 }
