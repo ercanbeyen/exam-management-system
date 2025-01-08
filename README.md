@@ -6,29 +6,32 @@
 
 ### Summary
 It is an exam management system that covers exam procedures.<br/>
-There are 9 applications (4 services and 5 servers) in this project.
+There are 10 applications (5 services and 5 servers) in this project.
 
 Services:
+- Auth: 9898
 - Exam: 8081
 - Candidate: 8082 
 - School: 8083
 - Notification: 8084
 
 Server:
-- Admin Server: 8508
-- Config Server: 8888
-- Eureka Server: 8761
-- Zipkin Server: 9411
-- Gateway Server: 8080
+- Admin: 8508
+- Config: 8888
+- Eureka: 8761
+- Zipkin: 9411
+- Gateway: 8080
 
 ### Requirements
+- User must log in to use the application.
 - Exam registration should include school, classroom, date, time and candidate information.
 
 ### Tech Stack
 ---
-- Java 21
+- Java 17
 - Spring Boot
 - Spring Cloud
+- Spring Security
 - Spring Data JPA
 - Spring Data MongoDB
 - MySQL
@@ -54,13 +57,14 @@ Then you should run the following applications in order
 
 1) Config Server
 2) Zipkin Server
-3) Admin Server
-4) Eureka Server
-5) Gateway Server
-6) School Service
-7) Candidate Service
-8) Exam Service
-9) Notification Service
+3) Eureka Server
+4) Admin Server
+5) Auth Service
+6) Gateway Server
+7) School Service
+8) Candidate Service
+9) Exam Service
+10) Notification Service
 
 ### Monitor
 ---
