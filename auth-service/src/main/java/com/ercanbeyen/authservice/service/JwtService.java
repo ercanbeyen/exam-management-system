@@ -45,7 +45,7 @@ public class JwtService {
     }
 
     public void validateToken(final String token) {
-        getJwsClaims(token);
+        extractJwsClaims(token);
     }
 
     public String extractUsername(String token) {
@@ -65,7 +65,7 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return getJwsClaims(token)
+        return extractJwsClaims(token)
                 .getBody();
     }
 
@@ -76,7 +76,7 @@ public class JwtService {
         String accessToken = generateAccessToken(claims, userDetails);
         String refreshToken = Jwts.builder()
                 .setSubject(username)
-                .setExpiration(JwtUtil.calculateExpirationDate(1000 * 60 * 90))
+                .setExpiration(JwtUtil.calculateExpirationDate(60))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
 
@@ -99,12 +99,12 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(JwtUtil.calculateExpirationDate(1000 * 60 * 30))
+                .setExpiration(JwtUtil.calculateExpirationDate(15))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    private Jws<Claims> getJwsClaims(String token) {
+    private Jws<Claims> extractJwsClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignKey())
                 .build()

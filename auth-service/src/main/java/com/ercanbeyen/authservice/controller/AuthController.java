@@ -4,6 +4,8 @@ import com.ercanbeyen.authservice.dto.request.LoginRequest;
 import com.ercanbeyen.authservice.dto.request.RegistrationRequest;
 import com.ercanbeyen.authservice.dto.response.MessageResponse;
 import com.ercanbeyen.authservice.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +13,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -28,13 +29,17 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> loginUser(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.loginUser(request));
+    public ResponseEntity<Void> loginUser(@RequestBody LoginRequest request, HttpServletResponse servletResponse) {
+        authService.loginUser(request, servletResponse);
+        return ResponseEntity.ok()
+                .build();
     }
 
     @GetMapping("/token-refresh")
-    public ResponseEntity<Map<String, String>> refreshToken(@RequestParam("token") String token) {
-        return ResponseEntity.ok(authService.refreshToken(token));
+    public ResponseEntity<Void> refreshToken(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        authService.refreshToken(servletRequest, servletResponse);
+        return ResponseEntity.ok()
+                .build();
     }
 
     @GetMapping("/validate")

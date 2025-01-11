@@ -1,12 +1,19 @@
 package com.ercanbeyen.authservice.service;
 
+import com.ercanbeyen.authservice.constant.enums.TokenStatus;
+import com.ercanbeyen.authservice.constant.message.JwtMessage;
 import com.ercanbeyen.authservice.dto.request.LoginRequest;
 import com.ercanbeyen.authservice.dto.request.RegistrationRequest;
+import com.ercanbeyen.authservice.entity.RefreshToken;
 import com.ercanbeyen.authservice.entity.UserCredential;
 import com.ercanbeyen.authservice.constant.enums.Role;
 import com.ercanbeyen.authservice.exception.InvalidUserCredentialException;
 import com.ercanbeyen.authservice.exception.UserAlreadyExistException;
+import com.ercanbeyen.authservice.repository.RefreshTokenRepository;
 import com.ercanbeyen.authservice.repository.UserCredentialRepository;
+import com.ercanbeyen.authservice.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +33,7 @@ import java.util.Map;
 @Slf4j
 public class AuthService {
     private final UserCredentialRepository userCredentialRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
@@ -51,17 +59,41 @@ public class AuthService {
         return "User is successfully registered";
     }
 
-    public Map<String, String> loginUser(LoginRequest request) {
-        authenticateUser(request);
+    public void loginUser(LoginRequest loginRequest, HttpServletResponse servletResponse) {
+        authenticateUser(loginRequest);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.username());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.username());
         log.info("Login User Details: {}", userDetails.getUsername());
 
-        return jwtService.generateTokens(userDetails);
+        Map<String, String> tokens = jwtService.generateTokens(userDetails);
+
+        UserCredential userCredential = userCredentialRepository.findByUsername(loginRequest.username())
+                .orElseThrow(() -> new RuntimeException("User credential does not exist"));
+
+        refreshTokenRepository.findByUserCredential(userCredential)
+                .ifPresent(refreshTokenRepository::delete);
+
+        RefreshToken refreshToken = new RefreshToken(tokens.get(JwtMessage.REFRESH_TOKEN_TOKEN), TokenStatus.ACTIVE, userCredential);
+        refreshTokenRepository.save(refreshToken);
+
+        servletResponse.setHeader(JwtMessage.ACCESS_TOKEN, tokens.get(JwtMessage.ACCESS_TOKEN));
+        servletResponse.setHeader(JwtMessage.REFRESH_TOKEN_TOKEN, tokens.get(JwtMessage.REFRESH_TOKEN_TOKEN));
     }
 
-    public Map<String, String> refreshToken(String token) {
-        return jwtService.refreshToken(token);
+    public void refreshToken(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        String token = JwtUtil.extractTokenFromHeader(servletRequest);
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Token is not found"));
+
+        if (refreshToken.getStatus() == TokenStatus.REVOKED) {
+            throw new RuntimeException("Token has already been revoked");
+        }
+
+        log.info("Token is active");
+        Map<String, String> tokens = jwtService.refreshToken(token);
+
+        servletResponse.setHeader(JwtMessage.ACCESS_TOKEN, tokens.get(JwtMessage.ACCESS_TOKEN));
+        servletResponse.setHeader(JwtMessage.REFRESH_TOKEN_TOKEN, tokens.get(JwtMessage.REFRESH_TOKEN_TOKEN));
     }
 
     public void validateToken(String token) {
