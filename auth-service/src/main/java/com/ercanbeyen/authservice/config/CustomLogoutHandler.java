@@ -1,8 +1,7 @@
 package com.ercanbeyen.authservice.config;
 
-import com.ercanbeyen.authservice.constant.enums.TokenStatus;
-import com.ercanbeyen.authservice.entity.RefreshToken;
-import com.ercanbeyen.authservice.repository.RefreshTokenRepository;
+import com.ercanbeyen.authservice.entity.UserToken;
+import com.ercanbeyen.authservice.service.UserTokenService;
 import com.ercanbeyen.authservice.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,16 +14,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CustomLogoutHandler implements LogoutHandler {
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserTokenService userTokenService;
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         String token = JwtUtil.extractTokenFromHeader(request);
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Token does not exist"));
-
-        refreshToken.setStatus(TokenStatus.REVOKED);
-        refreshTokenRepository.save(refreshToken);
+        UserToken userToken = userTokenService.findByAccessToken(token);
+        userTokenService.revokeAllTokensByUserCredential(userToken.getUserCredential());
 
         SecurityContextHolder.clearContext();
     }

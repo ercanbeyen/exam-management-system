@@ -66,7 +66,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                             .header("loggedInUsername", username)
                             .build();
                 } catch (Exception exception) {
-                    log.error("RestTemplate did not send the request. Exception: {}", exception.getMessage());
+                    log.error("AuthenticationFilter::apply exception caught: {}", exception.getMessage());
                     throw exception;
                 }
             }

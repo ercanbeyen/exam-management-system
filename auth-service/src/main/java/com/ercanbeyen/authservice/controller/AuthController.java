@@ -3,6 +3,7 @@ package com.ercanbeyen.authservice.controller;
 import com.ercanbeyen.authservice.dto.request.LoginRequest;
 import com.ercanbeyen.authservice.dto.request.RegistrationRequest;
 import com.ercanbeyen.authservice.dto.response.MessageResponse;
+import com.ercanbeyen.authservice.entity.UserCredential;
 import com.ercanbeyen.authservice.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,14 +24,14 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<MessageResponse> registerUser(@RequestBody RegistrationRequest request) {
-        String message = authService.registerUser(request);
+        String message = authService.register(request);
         MessageResponse response = new MessageResponse(message);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
     public ResponseEntity<Void> loginUser(@RequestBody LoginRequest request, HttpServletResponse servletResponse) {
-        authService.loginUser(request, servletResponse);
+        authService.login(request, servletResponse);
         return ResponseEntity.ok()
                 .build();
     }
@@ -51,8 +52,8 @@ public class AuthController {
     }
 
     @PutMapping("/{username}/roles")
-    public ResponseEntity<MessageResponse> updateRoles(@PathVariable("username") String username, @RequestParam("roles") List<String> roles) {
-        String message = authService.updateRoles(username, roles);
+    public ResponseEntity<MessageResponse> updateUserCredential(@PathVariable("username") String username, @RequestBody UserCredential userCredential) {
+        String message = authService.updateUserCredential(username, userCredential);
         MessageResponse response = new MessageResponse(message);
         return ResponseEntity.ok(response);
     }
@@ -68,7 +69,7 @@ public class AuthController {
     }
 
     @GetMapping("/extract/username")
-    public String updateRoles(@RequestParam("token") String token) {
+    public String extractUsername(@RequestParam("token") String token) {
         return authService.extractUsername(token);
     }
 

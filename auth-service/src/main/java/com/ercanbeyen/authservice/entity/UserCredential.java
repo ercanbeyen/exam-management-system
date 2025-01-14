@@ -32,4 +32,11 @@ public class UserCredential {
                 ", roles=" + roles +
                 '}';
     }
+
+    public UserCredential(String username, String password, String email, List<String> roles) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.roles = roles;
+    }
 }

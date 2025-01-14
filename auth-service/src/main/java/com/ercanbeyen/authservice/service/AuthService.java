@@ -4,13 +4,10 @@ import com.ercanbeyen.authservice.constant.enums.TokenStatus;
 import com.ercanbeyen.authservice.constant.message.JwtMessage;
 import com.ercanbeyen.authservice.dto.request.LoginRequest;
 import com.ercanbeyen.authservice.dto.request.RegistrationRequest;
-import com.ercanbeyen.authservice.entity.RefreshToken;
+import com.ercanbeyen.authservice.entity.UserToken;
 import com.ercanbeyen.authservice.entity.UserCredential;
-import com.ercanbeyen.authservice.constant.enums.Role;
 import com.ercanbeyen.authservice.exception.InvalidUserCredentialException;
-import com.ercanbeyen.authservice.exception.UserAlreadyExistException;
-import com.ercanbeyen.authservice.repository.RefreshTokenRepository;
-import com.ercanbeyen.authservice.repository.UserCredentialRepository;
+import com.ercanbeyen.authservice.exception.TokenAlreadyRevokedException;
 import com.ercanbeyen.authservice.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,7 +19,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,86 +28,78 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthService {
-    private final UserCredentialRepository userCredentialRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final UserTokenService userTokenService;
+    private final UserCredentialService userCredentialService;
     private final AuthenticationManager authenticationManager;
 
-    public String registerUser(RegistrationRequest request) {
-        boolean userExists = userCredentialRepository.existsByUsername(request.username());
-
-        if (userExists) {
-            throw new UserAlreadyExistException("User already exists");
-        }
-
-        UserCredential userCredential = new UserCredential();
-        String encryptedPassword = passwordEncoder.encode(request.password());
-
-        userCredential.setUsername(request.username());
-        userCredential.setPassword(encryptedPassword);
-        userCredential.setEmail(request.email());
-        userCredential.setRoles(List.of(Role.USER.toString()));
-
-        userCredentialRepository.save(userCredential);
+    public String register(RegistrationRequest request) {
+        userCredentialService.checkUserCredentialByUsername(request.username());
+        userCredentialService.createUserCredential(request);
 
         return "User is successfully registered";
     }
 
-    public void loginUser(LoginRequest loginRequest, HttpServletResponse servletResponse) {
+    public void login(LoginRequest loginRequest, HttpServletResponse servletResponse) {
         authenticateUser(loginRequest);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.username());
+        String username = loginRequest.username();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         log.info("Login User Details: {}", userDetails.getUsername());
 
         Map<String, String> tokens = jwtService.generateTokens(userDetails);
+        UserCredential userCredential = userCredentialService.findByUsername(username);
 
-        UserCredential userCredential = userCredentialRepository.findByUsername(loginRequest.username())
-                .orElseThrow(() -> new RuntimeException("User credential does not exist"));
+        userTokenService.revokeAllTokensByUserCredential(userCredential);
 
-        refreshTokenRepository.findByUserCredential(userCredential)
-                .ifPresent(refreshTokenRepository::delete);
+        String accessToken = tokens.get(JwtMessage.ACCESS_TOKEN);
+        String refreshToken = tokens.get(JwtMessage.REFRESH_TOKEN_TOKEN);
 
-        RefreshToken refreshToken = new RefreshToken(tokens.get(JwtMessage.REFRESH_TOKEN_TOKEN), TokenStatus.ACTIVE, userCredential);
-        refreshTokenRepository.save(refreshToken);
+        userTokenService.createUserToken(accessToken, refreshToken, userCredential);
 
-        servletResponse.setHeader(JwtMessage.ACCESS_TOKEN, tokens.get(JwtMessage.ACCESS_TOKEN));
-        servletResponse.setHeader(JwtMessage.REFRESH_TOKEN_TOKEN, tokens.get(JwtMessage.REFRESH_TOKEN_TOKEN));
+        servletResponse.setHeader(JwtMessage.ACCESS_TOKEN, accessToken);
+        servletResponse.setHeader(JwtMessage.REFRESH_TOKEN_TOKEN, refreshToken);
     }
 
     public void refreshToken(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
-        String token = JwtUtil.extractTokenFromHeader(servletRequest);
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Token is not found"));
-
-        if (refreshToken.getStatus() == TokenStatus.REVOKED) {
-            throw new RuntimeException("Token has already been revoked");
-        }
+        String refreshToken = JwtUtil.extractTokenFromHeader(servletRequest);
+        UserToken userToken = userTokenService.findByRefreshToken(refreshToken);
 
         log.info("Token is active");
-        Map<String, String> tokens = jwtService.refreshToken(token);
+        Map<String, String> tokens = jwtService.refreshToken(refreshToken);
 
-        servletResponse.setHeader(JwtMessage.ACCESS_TOKEN, tokens.get(JwtMessage.ACCESS_TOKEN));
-        servletResponse.setHeader(JwtMessage.REFRESH_TOKEN_TOKEN, tokens.get(JwtMessage.REFRESH_TOKEN_TOKEN));
+        UserCredential userCredential = userToken.getUserCredential();
+        userTokenService.revokeAllTokensByUserCredential(userCredential);
+
+        String accessToken = tokens.get(JwtMessage.ACCESS_TOKEN);
+
+        userTokenService.createUserToken(accessToken, refreshToken, userCredential);
+
+        servletResponse.setHeader(JwtMessage.ACCESS_TOKEN, accessToken);
+        servletResponse.setHeader(JwtMessage.REFRESH_TOKEN_TOKEN, refreshToken);
     }
 
     public void validateToken(String token) {
         jwtService.validateToken(token);
+        log.info("Token is successfully parsed");
+
+        TokenStatus tokenStatus = userTokenService.getUserTokenStatusByAccessToken(token);
+        log.info("Access token is successfully found");
+
+        if (tokenStatus == TokenStatus.REVOKED) {
+            throw new TokenAlreadyRevokedException("Access token has already been revoked");
+        }
+
         log.info("Token is validated");
     }
 
-    public String updateRoles(String username, List<String> roles) {
-        UserCredential userCredential = userCredentialRepository.findByUsername(username).orElseThrow();
-        userCredential.setRoles(roles);
-        userCredentialRepository.save(userCredential);
-
-        return "Roles of user are updated";
+    public String updateUserCredential(String username, UserCredential request) {
+        return userCredentialService.updateUserCredential(username, request);
     }
 
     public List<String> getRoles(String username) {
-        UserCredential userCredential = userCredentialRepository.findByUsername(username).orElseThrow();
-        return userCredential.getRoles();
+        return userCredentialService.getRoles(username);
     }
 
     public List<GrantedAuthority> getAuthorities(String username) {
