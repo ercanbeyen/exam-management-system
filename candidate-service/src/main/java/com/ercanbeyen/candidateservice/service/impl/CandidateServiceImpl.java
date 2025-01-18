@@ -1,6 +1,7 @@
 package com.ercanbeyen.candidateservice.service.impl;
 
 import com.ercanbeyen.candidateservice.entity.Candidate;
+import com.ercanbeyen.candidateservice.util.AuthUtil;
 import com.ercanbeyen.servicecommon.client.SchoolServiceClient;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
@@ -23,11 +24,11 @@ public class CandidateServiceImpl implements CandidateService {
     private final CandidateRepository candidateRepository;
     private final CandidateMapper candidateMapper;
     private final SchoolServiceClient schoolServiceClient;
+    private final AuthUtil authUtil;
 
     @Override
     public CandidateDto createCandidate(CandidateDto request) {
-        ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(request.schoolId());
-        log.info(LogMessage.CLIENT_SERVICE_RESPONSE, "School", schoolServiceResponse);
+        checkSchool(request);
 
         Candidate candidate = candidateMapper.dtoToEntity(request);
         candidate.setSchoolId(request.schoolId());
@@ -36,23 +37,26 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
-    public CandidateDto updateCandidate(String id, CandidateDto request) {
-        Candidate candidateInDb = findById(id);
+    public CandidateDto updateCandidate(String id, CandidateDto request, String username) {
+        Candidate candidate = findById(id);
+        authUtil.checkLoggedInUser(candidate.getUsername(), username);
 
-        ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(request.schoolId());
-        log.info(LogMessage.CLIENT_SERVICE_RESPONSE, "School", schoolServiceResponse);
+        checkSchool(request);
 
-        candidateInDb.setSchoolId(request.schoolId());
-        candidateInDb.setName(request.name());
-        candidateInDb.setAge(request.age());
-        candidateInDb.setGender(request.gender());
+        candidate.setSchoolId(request.schoolId());
+        candidate.setFullName(request.fullName());
+        candidate.setAge(request.age());
+        candidate.setGender(request.gender());
 
-        return candidateMapper.entityToDto(candidateRepository.save(candidateInDb));
+        return candidateMapper.entityToDto(candidateRepository.save(candidate));
     }
 
     @Override
-    public CandidateDto getCandidate(String id) {
-        return candidateMapper.entityToDto(findById(id));
+    public CandidateDto getCandidate(String id, String username) {
+        Candidate candidate = findById(id);
+        authUtil.checkLoggedInUser(candidate.getUsername(), username);
+
+        return candidateMapper.entityToDto(candidate);
     }
 
     @Override
@@ -64,8 +68,16 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
-    public String deleteCandidate(String id) {
-        candidateRepository.deleteById(id);
+    public String deleteCandidate(String id, String username) {
+        candidateRepository.findById(id)
+                .ifPresentOrElse(candidate -> {
+                    authUtil.checkLoggedInUser(candidate.getUsername(), username);
+                    candidateRepository.deleteById(id);
+                }, () -> {
+                    log.error("Candidate {} is not found", id);
+                    throw new ResourceNotFoundException("Candidate is not found");
+                });
+
         return String.format("Candidate %s is successfully deleted", id);
     }
 
@@ -76,5 +88,10 @@ public class CandidateServiceImpl implements CandidateService {
         log.info(LogMessage.RESOURCE_FOUND, "Candidate", id);
 
         return candidate;
+    }
+
+    private void checkSchool(CandidateDto request) {
+        ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(request.schoolId());
+        log.info(LogMessage.CLIENT_SERVICE_RESPONSE, "School", schoolServiceResponse);
     }
 }

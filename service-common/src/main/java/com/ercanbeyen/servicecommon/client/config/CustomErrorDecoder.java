@@ -1,9 +1,6 @@
 package com.ercanbeyen.servicecommon.client.config;
 
-import com.ercanbeyen.servicecommon.client.exception.BadRequestException;
-import com.ercanbeyen.servicecommon.client.exception.ErrorResponse;
-import com.ercanbeyen.servicecommon.client.exception.InternalServerErrorException;
-import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
+import com.ercanbeyen.servicecommon.client.exception.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
@@ -38,6 +35,7 @@ public class CustomErrorDecoder implements ErrorDecoder {
 
         return switch (response.status()) {
             case 400 -> new BadRequestException(message);
+            case 403 -> new ResourceForbiddenException(message);
             case 404 -> new ResourceNotFoundException(message);
             case 500 -> new InternalServerErrorException(message);
             default -> new Exception(message);

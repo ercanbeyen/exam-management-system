@@ -19,7 +19,6 @@ public class UserCredential {
     @Column(unique = true, nullable = false)
     private String username;
     private String password;
-    private String email;
     private List<String> roles;
 
     @Override
@@ -28,15 +27,8 @@ public class UserCredential {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
                 ", roles=" + roles +
                 '}';
     }
 
-    public UserCredential(String username, String password, String email, List<String> roles) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.roles = roles;
-    }
 }

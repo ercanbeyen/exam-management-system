@@ -78,4 +78,12 @@ public class AuthController {
         log.info("We are in AuthController::checkRole. Role {}", role);
         return authService.checkRole(token, role);
     }
+
+    @GetMapping("/{username}/check-role")
+    public ResponseEntity<Boolean> checkUserRole(@PathVariable("username") String username, @RequestParam("role") String role) {
+        log.info("We are in AuthController::checkUserRole. Role {}", role);
+        boolean response = authService.checkUserRole(username, role);
+        log.info("Response: {}", response);
+        return ResponseEntity.ok(response);
+    }
 }

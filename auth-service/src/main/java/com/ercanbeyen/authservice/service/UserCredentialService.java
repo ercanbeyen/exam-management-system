@@ -27,7 +27,6 @@ public class UserCredentialService {
 
         userCredential.setUsername(request.username());
         userCredential.setPassword(encryptedPassword);
-        userCredential.setEmail(request.email());
         userCredential.setRoles(List.of(Role.USER.toString()));
 
         UserCredential savedUserCredential = userCredentialRepository.save(userCredential);
@@ -42,8 +41,7 @@ public class UserCredentialService {
         }
 
         userCredential.setUsername(request.getUsername());
-        userCredential.setEmail(request.getEmail());
-        userCredential.setRoles(userCredential.getRoles());
+        userCredential.setRoles(request.getRoles());
 
         UserCredential savedUserCredential = userCredentialRepository.save(userCredential);
         log.info("User Credential {} is successfully updated", savedUserCredential.getId());

@@ -12,6 +12,7 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+    private String username;
     private String message;
     private LocalDateTime createdAt;
 }

@@ -35,7 +35,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             ServerHttpRequest serverHttpRequest = null;
             if (routeValidator.isSecured.test(exchange.getRequest())) {
                 if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) { // header contains token or not
-                    throw new UnauthorizedUserException("Missing authorization header");
+                    throw new UnauthorizedUserException("AuthenticationFilter::apply exception: Missing authorization header");
                 }
 
                 String authHeader = Objects.requireNonNull(
@@ -63,7 +63,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                     String username = restTemplate.getForObject(AUTH_URL + "/extract/username?token=" + authHeader, String.class);
                     serverHttpRequest = exchange.getRequest()
                             .mutate()
-                            .header("loggedInUsername", username)
+                            .header("loggedInUser", username)
                             .build();
                 } catch (Exception exception) {
                     log.error("AuthenticationFilter::apply exception caught: {}", exception.getMessage());

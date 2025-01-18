@@ -34,7 +34,7 @@ spring:
           predicates:
             - Path=/schools/**, /classrooms/**
           filters:
-            - AuthenticationFilter=USER
+            - AuthenticationFilter=ADMIN
             - AddRequestHeader=X-Client,web
             - AddResponseHeader=X-Type,inorganic
             - name: Retry
@@ -53,7 +53,7 @@ spring:
           predicates:
             - Path=/candidates/**
           filters:
-            - AuthenticationFilter=ADMIN
+            - AuthenticationFilter=USER
             - AddRequestHeader=X-Client,web
             - AddResponseHeader=X-Type,inorganic
             - name: Retry

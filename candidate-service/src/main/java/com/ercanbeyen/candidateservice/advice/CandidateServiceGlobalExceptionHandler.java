@@ -1,9 +1,6 @@
 package com.ercanbeyen.candidateservice.advice;
 
-import com.ercanbeyen.servicecommon.client.exception.BadRequestException;
-import com.ercanbeyen.servicecommon.client.exception.ErrorResponse;
-import com.ercanbeyen.servicecommon.client.exception.GlobalErrorCode;
-import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
+import com.ercanbeyen.servicecommon.client.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +15,14 @@ public class CandidateServiceGlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, GlobalErrorCode.CANDIDATE_BAD_REQUEST_ERROR, exception.getMessage());
         log.error("CandidateServiceGlobalExceptionHandler::handleBadRequestException exception caught {}", exception.getMessage());
         return ResponseEntity.badRequest()
+                .body(errorResponse);
+    }
+
+    @ExceptionHandler(ResourceForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleResourceForbiddenException(Exception exception) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN, GlobalErrorCode.CANDIDATE_FORBIDDEN_ERROR, exception.getMessage());
+        log.error("CandidateServiceGlobalExceptionHandler::handleResourceForbiddenException exception caught {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(errorResponse);
     }
 

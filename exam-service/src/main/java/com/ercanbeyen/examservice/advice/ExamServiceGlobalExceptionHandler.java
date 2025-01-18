@@ -18,6 +18,14 @@ public class ExamServiceGlobalExceptionHandler {
                 .body(errorResponse);
     }
 
+    @ExceptionHandler(ResourceForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleResourceForbiddenException(Exception exception) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN, GlobalErrorCode.EXAM_FORBIDDEN_ERROR, exception.getMessage());
+        log.error("ExamServiceGlobalExceptionHandler::handleResourceForbiddenException exception caught {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(errorResponse);
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(Exception exception) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, GlobalErrorCode.EXAM_NOT_FOUND_ERROR, exception.getMessage());

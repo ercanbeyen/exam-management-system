@@ -9,10 +9,13 @@ import com.ercanbeyen.authservice.entity.UserCredential;
 import com.ercanbeyen.authservice.exception.InvalidUserCredentialException;
 import com.ercanbeyen.authservice.exception.TokenAlreadyRevokedException;
 import com.ercanbeyen.authservice.util.JwtUtil;
+import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
+import com.ercanbeyen.servicecommon.client.exception.InternalServerErrorException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,7 +23,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,10 +39,18 @@ public class AuthService {
     private final UserTokenService userTokenService;
     private final UserCredentialService userCredentialService;
     private final AuthenticationManager authenticationManager;
+    private final RestTemplate restTemplate;
 
     public String register(RegistrationRequest request) {
         userCredentialService.checkUserCredentialByUsername(request.username());
         userCredentialService.createUserCredential(request);
+
+        try {
+            createCandidate(request);
+        } catch (Exception exception) {
+            log.error("AuthService::register exception caught: {}", exception.getMessage());
+            throw new InternalServerErrorException("Candidate could not created");
+        }
 
         return "User is successfully registered";
     }
@@ -115,6 +129,11 @@ public class AuthService {
         return jwtService.hasRole(token, role);
     }
 
+    public boolean checkUserRole(String username, String role) {
+        List<String> roles = getRoles(username);
+        return roles.contains(role);
+    }
+
     private void authenticateUser(LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
@@ -128,5 +147,12 @@ public class AuthService {
             log.error("Exception: {}. Message: {}", exception.getClass(), exception.getMessage());
             throw exception;
         }
+    }
+
+    private void createCandidate(RegistrationRequest request) throws URISyntaxException {
+        URI uri = new URI("http://localhost:" + 8082 + "/candidates");
+
+        CandidateDto requestedCandidate = new CandidateDto(null, request.username(), request.fullName(), request.age(), request.gender(), request.schoolId());
+        restTemplate.postForObject(uri, requestedCandidate, CandidateDto.class);
     }
 }

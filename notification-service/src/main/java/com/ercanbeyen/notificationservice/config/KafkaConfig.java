@@ -41,7 +41,7 @@ public class KafkaConfig {
     @Bean
     public Function<NotificationDto, NotificationDto> processorBinding() {
         return request -> {
-            NotificationDto notificationDto = new NotificationDto(request.message(), LocalDateTime.now());
+            NotificationDto notificationDto = new NotificationDto(request.username(), request.message(), LocalDateTime.now());
             log.info("Process is in processor stage");
             return notificationDto;
         };

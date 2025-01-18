@@ -10,6 +10,7 @@ import com.ercanbeyen.examservice.repository.ExamEventRepository;
 import com.ercanbeyen.examservice.service.ExamEventNotificationService;
 import com.ercanbeyen.examservice.service.ExamEventService;
 import com.ercanbeyen.examservice.service.ExamService;
+import com.ercanbeyen.servicecommon.client.AuthServiceClient;
 import com.ercanbeyen.servicecommon.client.SchoolServiceClient;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
@@ -28,34 +29,36 @@ import java.util.Optional;
 public class ExamEventServiceImpl implements ExamEventService {
     private final ExamEventRepository examEventRepository;
     private final ExamEventMapper examEventMapper;
-    private final ExamService examService;
     private final SchoolServiceClient schoolServiceClient;
+    private final AuthServiceClient authServiceClient;
+    private final ExamService examService;
     private final ExamEventNotificationService examEventNotificationService;
 
+
     @Override
-    public ExamEventDto createExamEvent(ExamEventDto request) {
+    public ExamEventDto createExamEvent(ExamEventDto request, String username) {
         ExamEvent constructExamEvent = constructExamEvent(null, request);
         ExamEvent savedExamEvent = examEventRepository.save(constructExamEvent);
 
         ExamEventDto examEventDto = examEventMapper.entityToDto(savedExamEvent);
-        examEventNotificationService.sendToQueue(examEventDto);
+        examEventNotificationService.sendToQueue(examEventDto, username);
 
         return examEventDto;
     }
 
     @Override
-    public ExamEventDto updateExamEvent(String id, ExamEventDto request) {
+    public ExamEventDto updateExamEvent(String id, ExamEventDto request, String username) {
         ExamEvent examEvent = constructExamEvent(id, request);
         return examEventMapper.entityToDto(examEventRepository.save(examEvent));
     }
 
     @Override
-    public ExamEventDto getExamEvent(String id) {
+    public ExamEventDto getExamEvent(String id, String username) {
         return examEventMapper.entityToDto(findById(id));
     }
 
     @Override
-    public List<ExamEventDto> getExamEvents() {
+    public List<ExamEventDto> getExamEvents(String username) {
         return examEventRepository.findAll()
                 .stream()
                 .map(examEventMapper::entityToDto)
@@ -63,7 +66,7 @@ public class ExamEventServiceImpl implements ExamEventService {
     }
 
     @Override
-    public String deleteExamEvent(String id) {
+    public String deleteExamEvent(String id, String username) {
         ExamEvent examEvent = findById(id);
         examEventRepository.delete(examEvent);
         return String.format("Exam event %s is successfully deleted", id);

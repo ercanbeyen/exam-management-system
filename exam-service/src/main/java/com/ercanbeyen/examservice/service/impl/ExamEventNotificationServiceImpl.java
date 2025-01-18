@@ -19,9 +19,9 @@ public class ExamEventNotificationServiceImpl implements ExamEventNotificationSe
     private final StreamBridge streamBridge;
 
     @Override
-    public void sendToQueue(ExamEventDto examEventDto) {
+    public void sendToQueue(ExamEventDto examEventDto, String username) {
         String message = String.format("Exam event %s is for exam %s", examEventDto.id(), examEventDto.examId());
-        NotificationDto notificationDto = new NotificationDto(message, LocalDateTime.now());
+        NotificationDto notificationDto = new NotificationDto(username, message, LocalDateTime.now());
 
         streamBridge.send(ChannelTopic.PRODUCER_BINDING_IN_0, notificationDto);
         log.info(LogMessage.NOTIFICATION_SENT_TO_QUEUE, ChannelTopic.PRODUCER_BINDING_IN_0, LocalDateTime.now());

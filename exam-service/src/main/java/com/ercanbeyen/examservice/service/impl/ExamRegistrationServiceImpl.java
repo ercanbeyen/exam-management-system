@@ -26,34 +26,37 @@ import java.util.Optional;
 public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     private final ExamRegistrationRepository examRegistrationRepository;
     private final ExamRegistrationMapper examRegistrationMapper;
-    private final ExamEventService examEventService;
     private final CandidateServiceClient candidateServiceClient;
+    private final ExamEventService examEventService;
     private final ExamRegistrationNotificationService examRegistrationNotificationService;
 
     @Override
-    public ExamRegistrationDto createExamRegistration(ExamRegistrationDto request) {
-        ExamRegistration examRegistration = constructExamRegistration(null, request);
+    public ExamRegistrationDto createExamRegistration(ExamRegistrationDto request, String username) {
+        ExamRegistration examRegistration = constructExamRegistration(null, request, username);
         ExamRegistration savedExamRegistration = examRegistrationRepository.save(examRegistration);
 
         ExamRegistrationDto examRegistrationDto = examRegistrationMapper.entityToDto(savedExamRegistration);
-        examRegistrationNotificationService.sendToQueue(examRegistrationDto);
+        examRegistrationNotificationService.sendToQueue(examRegistrationDto, username);
 
         return examRegistrationDto;
     }
 
     @Override
-    public ExamRegistrationDto updateExamRegistration(String id, ExamRegistrationDto request) {
-        ExamRegistration examRegistration = constructExamRegistration(id, request);
+    public ExamRegistrationDto updateExamRegistration(String id, ExamRegistrationDto request, String username) {
+        ExamRegistration examRegistration = constructExamRegistration(id, request, username);
         return examRegistrationMapper.entityToDto(examRegistrationRepository.save(examRegistration));
     }
 
     @Override
-    public ExamRegistrationDto getExamRegistration(String id) {
-        return examRegistrationMapper.entityToDto(findById(id));
+    public ExamRegistrationDto getExamRegistration(String id, String username) {
+        ExamRegistration examRegistration = findById(id);
+        checkCandidate(username, id);
+        
+        return examRegistrationMapper.entityToDto(examRegistration);
     }
 
     @Override
-    public List<ExamRegistrationDto> getExamRegistrations() {
+    public List<ExamRegistrationDto> getExamRegistrations(String username) {
         return examRegistrationRepository.findAll()
                 .stream()
                 .map(examRegistrationMapper::entityToDto)
@@ -61,8 +64,9 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     }
 
     @Override
-    public String deleteExamRegistration(String id) {
+    public String deleteExamRegistration(String id, String username) {
         ExamRegistration examRegistration = findById(id);
+        checkCandidate(username, examRegistration.getCandidateId());
         examRegistrationRepository.delete(examRegistration);
         return String.format("Exam registration %s is successfully deleted", id);
     }
@@ -76,19 +80,24 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         return examRegistration;
     }
 
-    private ExamRegistration constructExamRegistration(String id, ExamRegistrationDto request) {
+    private ExamRegistration constructExamRegistration(String id, ExamRegistrationDto request, String username) {
         ExamRegistration examRegistration = Optional.ofNullable(id).isPresent()
                 ? findById(id)
                 : examRegistrationMapper.dtoToEntity(request);
 
         ExamEvent examEvent = examEventService.findById(request.examEventId());
 
-        ResponseEntity<CandidateDto> candidateServiceResponse = candidateServiceClient.getCandidate(request.candidateId());
-        log.info(LogMessage.CLIENT_SERVICE_RESPONSE, "Candidate", candidateServiceResponse);
+        String candidateId = request.candidateId();
+        checkCandidate(username, candidateId);
 
         examRegistration.setExamEvent(examEvent);
-        examRegistration.setCandidateId(request.candidateId());
+        examRegistration.setCandidateId(candidateId);
 
         return examRegistration;
+    }
+
+    private void checkCandidate(String username, String candidateId) {
+        ResponseEntity<CandidateDto> candidateServiceResponse = candidateServiceClient.getCandidate(candidateId, username);
+        log.info(LogMessage.CLIENT_SERVICE_RESPONSE, "Candidate", candidateServiceResponse);
     }
 }

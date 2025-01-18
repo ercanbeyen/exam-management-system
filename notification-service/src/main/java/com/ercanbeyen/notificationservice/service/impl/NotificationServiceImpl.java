@@ -1,5 +1,6 @@
 package com.ercanbeyen.notificationservice.service.impl;
 
+import com.ercanbeyen.notificationservice.util.AuthUtil;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.logging.LogMessage;
 import com.ercanbeyen.servicecommon.client.messaging.NotificationDto;
@@ -19,31 +20,39 @@ import java.util.List;
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
+    private final AuthUtil authUtil;
 
     @Override
     public NotificationDto createNotification(NotificationDto request) {
-       Notification notification = notificationMapper.dtoToEntity(request);
-       return notificationMapper.entityToDto(notificationRepository.save(notification));
+        Notification notification = notificationMapper.dtoToEntity(request);
+        Notification saved = notificationRepository.save(notification);
+
+        return notificationMapper.entityToDto(saved);
     }
 
     @Override
-    public NotificationDto getNotification(String id) {
+    public NotificationDto getNotification(String id, String username) {
         Notification notification = findById(id);
+        authUtil.checkLoggedInUser(notification.getUsername(), username);
+
         return notificationMapper.entityToDto(notification);
     }
 
     @Override
-    public List<NotificationDto> getNotifications() {
-        return notificationRepository.findAll()
+    public List<NotificationDto> getNotifications(String username) {
+        return notificationRepository.findAllByUsername(username)
                 .stream()
                 .map(notificationMapper::entityToDto)
                 .toList();
     }
 
     @Override
-    public String deleteNotification(String id) {
+    public String deleteNotification(String id, String username) {
         Notification notification = findById(id);
+        authUtil.checkLoggedInUser(notification.getUsername(), username);
+
         notificationRepository.delete(notification);
+
         return String.format("Notification %s is successfully deleted", id);
     }
 
