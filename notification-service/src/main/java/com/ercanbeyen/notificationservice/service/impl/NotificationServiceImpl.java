@@ -1,6 +1,6 @@
 package com.ercanbeyen.notificationservice.service.impl;
 
-import com.ercanbeyen.notificationservice.util.AuthUtil;
+import com.ercanbeyen.notificationservice.client.AuthClient;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.logging.LogMessage;
 import com.ercanbeyen.servicecommon.client.messaging.NotificationDto;
@@ -20,7 +20,7 @@ import java.util.List;
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
-    private final AuthUtil authUtil;
+    private final AuthClient authClient;
 
     @Override
     public NotificationDto createNotification(NotificationDto request) {
@@ -33,7 +33,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public NotificationDto getNotification(String id, String username) {
         Notification notification = findById(id);
-        authUtil.checkLoggedInUser(notification.getUsername(), username);
+        authClient.checkLoggedInUser(notification.getUsername(), username);
 
         return notificationMapper.entityToDto(notification);
     }
@@ -49,7 +49,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public String deleteNotification(String id, String username) {
         Notification notification = findById(id);
-        authUtil.checkLoggedInUser(notification.getUsername(), username);
+        authClient.checkLoggedInUser(notification.getUsername(), username);
 
         notificationRepository.delete(notification);
 

@@ -1,4 +1,4 @@
-package com.ercanbeyen.candidateservice.util;
+package com.ercanbeyen.examservice.client;
 
 import com.ercanbeyen.servicecommon.client.AuthServiceClient;
 import com.ercanbeyen.servicecommon.client.exception.ResourceForbiddenException;
@@ -12,7 +12,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class AuthUtil {
+public class AuthClient {
     private final AuthServiceClient authServiceClient;
 
     public void checkUserHasAdminRole(String username) {
@@ -24,7 +24,7 @@ public class AuthUtil {
 
         if (!isAdmin) {
             log.error("Only admins may observe all candidates");
-            throw new ResourceForbiddenException(String.format("Username %s is not authorized", username));
+            throw new ResourceForbiddenException(String.format("User %s is not authorized", username));
         }
 
         log.info("User {} has admin role", username);
@@ -33,9 +33,9 @@ public class AuthUtil {
     public void checkLoggedInUser(String candidateUsername, String loggedInUsername) {
         if (!candidateUsername.equals(loggedInUsername)) {
             log.error("Usernames are not matching: {} & {}", candidateUsername, loggedInUsername);
-            throw new ResourceForbiddenException(String.format("Username %s is not authorized", loggedInUsername));
+            throw new ResourceForbiddenException("Unauthorized access");
         }
 
-        log.info("Usernames are matching");
+        log.info("Notification belongs to user {}", loggedInUsername);
     }
 }

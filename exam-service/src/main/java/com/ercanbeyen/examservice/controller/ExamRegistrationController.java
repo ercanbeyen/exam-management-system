@@ -2,7 +2,7 @@ package com.ercanbeyen.examservice.controller;
 
 import com.ercanbeyen.examservice.dto.ExamRegistrationDto;
 import com.ercanbeyen.examservice.service.ExamRegistrationService;
-import com.ercanbeyen.examservice.util.AuthUtil;
+import com.ercanbeyen.examservice.client.AuthClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ExamRegistrationController {
     private final ExamRegistrationService examRegistrationService;
-    private final AuthUtil authUtil;
+    private final AuthClient authClient;
 
     @PostMapping
     public ResponseEntity<ExamRegistrationDto> createExamRegistration(@RequestBody ExamRegistrationDto request, @RequestHeader("loggedInUser") String username) {
@@ -32,9 +32,9 @@ public class ExamRegistrationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ExamRegistrationDto>> getExamRegistrations(@RequestHeader("loggedInUser") String username) {
-        authUtil.checkUserHasAdminRole(username);
-        return ResponseEntity.ok(examRegistrationService.getExamRegistrations(username));
+    public ResponseEntity<List<ExamRegistrationDto>> getExamRegistrations(@RequestParam("user") String candidateUsername, @RequestHeader("loggedInUser") String loggedInUsername) {
+        authClient.checkLoggedInUser(candidateUsername, loggedInUsername);
+        return ResponseEntity.ok(examRegistrationService.getExamRegistrations(candidateUsername));
     }
 
     @DeleteMapping("/{id}")

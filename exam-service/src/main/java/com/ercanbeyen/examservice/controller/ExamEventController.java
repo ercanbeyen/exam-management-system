@@ -2,7 +2,7 @@ package com.ercanbeyen.examservice.controller;
 
 import com.ercanbeyen.examservice.dto.ExamEventDto;
 import com.ercanbeyen.examservice.service.ExamEventService;
-import com.ercanbeyen.examservice.util.AuthUtil;
+import com.ercanbeyen.examservice.client.AuthClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,17 +14,17 @@ import java.util.List;
 @RequestMapping("/exam-events")
 public class ExamEventController {
     private final ExamEventService examEventService;
-    private final AuthUtil authUtil;
+    private final AuthClient authClient;
 
     @PostMapping
     public ResponseEntity<ExamEventDto> createExamEvent(@RequestBody ExamEventDto request, @RequestHeader("loggedInUser") String username) {
-        authUtil.checkUserHasAdminRole(username);
+        authClient.checkUserHasAdminRole(username);
         return ResponseEntity.ok(examEventService.createExamEvent(request, username));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ExamEventDto> updateExamEvent(@PathVariable String id, @RequestBody ExamEventDto request, @RequestHeader("loggedInUser") String username) {
-        authUtil.checkUserHasAdminRole(username);
+        authClient.checkUserHasAdminRole(username);
         return ResponseEntity.ok(examEventService.updateExamEvent(id, request, username));
     }
 
@@ -40,7 +40,7 @@ public class ExamEventController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteExamEvent(@PathVariable String id, @RequestHeader("loggedInUser") String username) {
-        authUtil.checkUserHasAdminRole(username);
+        authClient.checkUserHasAdminRole(username);
         return ResponseEntity.ok(examEventService.deleteExamEvent(id, username));
     }
 }

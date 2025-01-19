@@ -8,6 +8,7 @@ public interface CandidateService {
     CandidateDto createCandidate(CandidateDto request);
     CandidateDto updateCandidate(String id, CandidateDto request, String username);
     CandidateDto getCandidate(String id, String username);
+    CandidateDto getCandidateByUsername(String username, String loggedInUsername);
     List<CandidateDto> getCandidates();
     String deleteCandidate(String id, String username);
 }

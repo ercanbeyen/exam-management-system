@@ -1,6 +1,6 @@
 package com.ercanbeyen.candidateservice.controller;
 
-import com.ercanbeyen.candidateservice.util.AuthUtil;
+import com.ercanbeyen.candidateservice.client.AuthClient;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
 import com.ercanbeyen.candidateservice.service.CandidateService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 public class CandidateController {
     private final CandidateService candidateService;
-    private final AuthUtil authUtil;
+    private final AuthClient authClient;
 
     @PostMapping
     public ResponseEntity<CandidateDto> createCandidate(@RequestBody CandidateDto request) {
@@ -34,9 +34,15 @@ public class CandidateController {
         return ResponseEntity.ok(candidateService.getCandidate(id, username));
     }
 
+    @GetMapping("/users/{username}")
+    public ResponseEntity<CandidateDto> getCandidateByUsername(@PathVariable("username") String username, @RequestHeader("loggedInUser") String loggedInUsername) {
+        log.info("loggedInUsername: {}", loggedInUsername);
+        return ResponseEntity.ok(candidateService.getCandidateByUsername(username, loggedInUsername));
+    }
+
     @GetMapping
     public ResponseEntity<List<CandidateDto>> getCandidates(@RequestHeader("loggedInUser") String username) {
-        authUtil.checkUserHasAdminRole(username);
+        authClient.checkUserHasAdminRole(username);
         return ResponseEntity.ok(candidateService.getCandidates());
     }
 

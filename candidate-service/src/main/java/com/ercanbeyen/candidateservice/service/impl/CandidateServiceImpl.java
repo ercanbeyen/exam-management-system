@@ -1,7 +1,7 @@
 package com.ercanbeyen.candidateservice.service.impl;
 
 import com.ercanbeyen.candidateservice.entity.Candidate;
-import com.ercanbeyen.candidateservice.util.AuthUtil;
+import com.ercanbeyen.candidateservice.client.AuthClient;
 import com.ercanbeyen.servicecommon.client.SchoolServiceClient;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
@@ -24,7 +24,7 @@ public class CandidateServiceImpl implements CandidateService {
     private final CandidateRepository candidateRepository;
     private final CandidateMapper candidateMapper;
     private final SchoolServiceClient schoolServiceClient;
-    private final AuthUtil authUtil;
+    private final AuthClient authClient;
 
     @Override
     public CandidateDto createCandidate(CandidateDto request) {
@@ -39,7 +39,7 @@ public class CandidateServiceImpl implements CandidateService {
     @Override
     public CandidateDto updateCandidate(String id, CandidateDto request, String username) {
         Candidate candidate = findById(id);
-        authUtil.checkLoggedInUser(candidate.getUsername(), username);
+        authClient.checkLoggedInUser(candidate.getUsername(), username);
 
         checkSchool(request);
 
@@ -54,7 +54,17 @@ public class CandidateServiceImpl implements CandidateService {
     @Override
     public CandidateDto getCandidate(String id, String username) {
         Candidate candidate = findById(id);
-        authUtil.checkLoggedInUser(candidate.getUsername(), username);
+        authClient.checkLoggedInUser(candidate.getUsername(), username);
+
+        return candidateMapper.entityToDto(candidate);
+    }
+
+    @Override
+    public CandidateDto getCandidateByUsername(String username, String loggedInUsername) {
+        Candidate candidate = candidateRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Candidate %s is not found", username)));
+
+        authClient.checkLoggedInUser(username, loggedInUsername);
 
         return candidateMapper.entityToDto(candidate);
     }
@@ -71,7 +81,7 @@ public class CandidateServiceImpl implements CandidateService {
     public String deleteCandidate(String id, String username) {
         candidateRepository.findById(id)
                 .ifPresentOrElse(candidate -> {
-                    authUtil.checkLoggedInUser(candidate.getUsername(), username);
+                    authClient.checkLoggedInUser(candidate.getUsername(), username);
                     candidateRepository.deleteById(id);
                 }, () -> {
                     log.error("Candidate {} is not found", id);
@@ -92,6 +102,7 @@ public class CandidateServiceImpl implements CandidateService {
 
     private void checkSchool(CandidateDto request) {
         ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(request.schoolId());
-        log.info(LogMessage.CLIENT_SERVICE_RESPONSE, "School", schoolServiceResponse);
+        log.debug(LogMessage.CLIENT_SERVICE_RESPONSE, "School", schoolServiceResponse);
+        log.info(LogMessage.RESOURCE_FOUND, "School", request.schoolId());
     }
 }

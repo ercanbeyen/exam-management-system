@@ -11,5 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @FeignClient(name = "candidate-service", configuration = FeignConfig.class)
 public interface CandidateServiceClient {
     @GetMapping("/candidates/{id}")
-    ResponseEntity<CandidateDto> getCandidate(@PathVariable("id") String id,  @RequestHeader("loggedInUser") String username);
+    ResponseEntity<CandidateDto> getCandidate(@PathVariable("id") String id, @RequestHeader("loggedInUser") String username);
+    @GetMapping("/candidates/users/{username}")
+    ResponseEntity<CandidateDto> getCandidateByUsername(@PathVariable("username") String username, @RequestHeader("loggedInUser") String loggedInUsername);
 }
