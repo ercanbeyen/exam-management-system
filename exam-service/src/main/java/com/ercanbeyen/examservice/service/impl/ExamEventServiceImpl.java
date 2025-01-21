@@ -10,7 +10,6 @@ import com.ercanbeyen.examservice.repository.ExamEventRepository;
 import com.ercanbeyen.examservice.service.ExamEventNotificationService;
 import com.ercanbeyen.examservice.service.ExamEventService;
 import com.ercanbeyen.examservice.service.ExamService;
-import com.ercanbeyen.servicecommon.client.AuthServiceClient;
 import com.ercanbeyen.servicecommon.client.SchoolServiceClient;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
@@ -30,7 +29,6 @@ public class ExamEventServiceImpl implements ExamEventService {
     private final ExamEventRepository examEventRepository;
     private final ExamEventMapper examEventMapper;
     private final SchoolServiceClient schoolServiceClient;
-    private final AuthServiceClient authServiceClient;
     private final ExamService examService;
     private final ExamEventNotificationService examEventNotificationService;
 

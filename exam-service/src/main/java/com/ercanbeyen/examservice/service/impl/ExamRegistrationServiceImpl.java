@@ -2,8 +2,11 @@ package com.ercanbeyen.examservice.service.impl;
 
 import com.ercanbeyen.examservice.client.CandidateClient;
 import com.ercanbeyen.examservice.dto.ExamRegistrationDto;
+import com.ercanbeyen.examservice.embeddable.RegistrationPeriod;
+import com.ercanbeyen.examservice.entity.Exam;
 import com.ercanbeyen.examservice.entity.ExamEvent;
 import com.ercanbeyen.examservice.entity.ExamRegistration;
+import com.ercanbeyen.examservice.exception.TimeExpiredException;
 import com.ercanbeyen.examservice.mapper.ExamRegistrationMapper;
 import com.ercanbeyen.examservice.repository.ExamRegistrationRepository;
 import com.ercanbeyen.examservice.service.ExamEventService;
@@ -15,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,6 +91,7 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
                 : examRegistrationMapper.dtoToEntity(request);
 
         ExamEvent examEvent = examEventService.findById(request.examEventId());
+        checkRegistrationPeriodBeforeCandidateRegistration(examEvent.getExam());
 
         String candidateId = request.candidateId();
         candidateClient.checkCandidate(username, candidateId);
@@ -95,5 +100,20 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         examRegistration.setCandidateId(candidateId);
 
         return examRegistration;
+    }
+
+    private static void checkRegistrationPeriodBeforeCandidateRegistration(Exam exam) {
+        RegistrationPeriod registrationPeriod = exam.getRegistrationPeriod();
+        LocalDateTime now = LocalDateTime.now();
+
+        if (registrationPeriod.getBeginAt().isAfter(now)) {
+            throw new TimeExpiredException("Registration period for exam " + exam.getSubject() + " has not been started yet.");
+        }
+
+        if (registrationPeriod.getEndAt().isBefore(now)) {
+            throw new TimeExpiredException("Registration period for exam " + exam.getSubject() + " has already been ended.");
+        }
+
+        log.info("Current time is in registration period for the exam");
     }
 }

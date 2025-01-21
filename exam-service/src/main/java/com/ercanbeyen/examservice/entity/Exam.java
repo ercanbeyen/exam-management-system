@@ -1,6 +1,7 @@
 package com.ercanbeyen.examservice.entity;
 
-import com.ercanbeyen.examservice.embeddable.ExamTime;
+import com.ercanbeyen.examservice.embeddable.ExamPeriod;
+import com.ercanbeyen.examservice.embeddable.RegistrationPeriod;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,7 +16,9 @@ public class Exam {
     private String id;
     private String subject;
     @Embedded
-    private ExamTime time;
+    private RegistrationPeriod registrationPeriod;
+    @Embedded
+    private ExamPeriod examPeriod;
     @OneToMany(mappedBy = "exam")
     private List<ExamEvent> examEvents;
 }

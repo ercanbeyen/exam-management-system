@@ -12,8 +12,8 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
-public class ExamTime {
+public class ExamPeriod {
     private LocalDate date;
-    private LocalTime startedAt;
-    private LocalTime finishedAt;
+    private LocalTime startTime;
+    private LocalTime finishTime;
 }

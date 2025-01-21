@@ -3,6 +3,7 @@ package com.ercanbeyen.examservice.controller;
 import com.ercanbeyen.examservice.dto.ExamDto;
 import com.ercanbeyen.examservice.service.ExamService;
 import com.ercanbeyen.examservice.client.AuthClient;
+import com.ercanbeyen.examservice.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +20,14 @@ public class ExamController {
     @PostMapping
     public ResponseEntity<ExamDto> createExam(@RequestBody ExamDto request, @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);
+        TimeUtil.checkExamTime(request);
         return ResponseEntity.ok(examService.createExam(request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ExamDto> updateExam(@PathVariable String id, @RequestBody ExamDto request, @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);
+        TimeUtil.checkExamTime(request);
         return ResponseEntity.ok(examService.updateExam(id, request));
     }
 
