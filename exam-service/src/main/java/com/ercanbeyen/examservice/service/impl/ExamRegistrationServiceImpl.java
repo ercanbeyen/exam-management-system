@@ -12,6 +12,7 @@ import com.ercanbeyen.examservice.repository.ExamRegistrationRepository;
 import com.ercanbeyen.examservice.service.ExamEventService;
 import com.ercanbeyen.examservice.service.ExamRegistrationNotificationService;
 import com.ercanbeyen.examservice.service.ExamRegistrationService;
+import com.ercanbeyen.servicecommon.client.exception.ResourceConflictException;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +34,23 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
 
     @Override
     public ExamRegistrationDto createExamRegistration(ExamRegistrationDto request, String username) {
-        ExamRegistration examRegistration = constructExamRegistration(null, request, username);
+        ExamEvent examEvent = examEventService.findById(request.examEventId());
+
+        checkExamRegistrationPeriod(examEvent.getExam());
+
+        String candidateId = request.candidateId();
+        candidateClient.checkCandidate(username, candidateId);
+
+        if (examRegistrationRepository.existsByExamEventAndCandidateId(examEvent, candidateId)) {
+            throw new ResourceConflictException("Candidate has already been registered to exam before");
+        }
+
+        log.info("Candidate {} has not registered to exam {} yet", candidateId, examEvent.getExam().getSubject());
+        ExamRegistration examRegistration = examRegistrationMapper.dtoToEntity(request);
+
+        examRegistration.setExamEvent(examEvent);
+        examRegistration.setCandidateId(request.candidateId());
+
         ExamRegistration savedExamRegistration = examRegistrationRepository.save(examRegistration);
 
         ExamRegistrationDto examRegistrationDto = examRegistrationMapper.entityToDto(savedExamRegistration);
@@ -45,7 +61,17 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
 
     @Override
     public ExamRegistrationDto updateExamRegistration(String id, ExamRegistrationDto request, String username) {
-        ExamRegistration examRegistration = constructExamRegistration(id, request, username);
+        ExamRegistration examRegistration = findById(id);
+
+        checkExamRegistrationPeriod(examRegistration.getExamEvent().getExam());
+
+        ExamEvent examEvent = examEventService.findById(request.examEventId());
+
+        String candidateId = request.candidateId();
+        candidateClient.checkCandidate(username, candidateId);
+
+        examRegistration.setExamEvent(examEvent);
+
         return examRegistrationMapper.entityToDto(examRegistrationRepository.save(examRegistration));
     }
 
@@ -85,24 +111,7 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         return examRegistration;
     }
 
-    private ExamRegistration constructExamRegistration(String id, ExamRegistrationDto request, String username) {
-        ExamRegistration examRegistration = Optional.ofNullable(id).isPresent()
-                ? findById(id)
-                : examRegistrationMapper.dtoToEntity(request);
-
-        ExamEvent examEvent = examEventService.findById(request.examEventId());
-        checkRegistrationPeriodBeforeCandidateRegistration(examEvent.getExam());
-
-        String candidateId = request.candidateId();
-        candidateClient.checkCandidate(username, candidateId);
-
-        examRegistration.setExamEvent(examEvent);
-        examRegistration.setCandidateId(candidateId);
-
-        return examRegistration;
-    }
-
-    private static void checkRegistrationPeriodBeforeCandidateRegistration(Exam exam) {
+    private static void checkExamRegistrationPeriod(Exam exam) {
         RegistrationPeriod registrationPeriod = exam.getRegistrationPeriod();
         LocalDateTime now = LocalDateTime.now();
 

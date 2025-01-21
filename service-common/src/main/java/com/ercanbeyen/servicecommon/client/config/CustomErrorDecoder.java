@@ -37,6 +37,7 @@ public class CustomErrorDecoder implements ErrorDecoder {
             case 400 -> new BadRequestException(message);
             case 403 -> new ResourceForbiddenException(message);
             case 404 -> new ResourceNotFoundException(message);
+            case 409 -> new ResourceConflictException(message);
             case 500 -> new InternalServerErrorException(message);
             default -> new Exception(message);
         };
