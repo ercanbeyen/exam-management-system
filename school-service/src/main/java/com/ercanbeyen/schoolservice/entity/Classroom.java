@@ -14,4 +14,5 @@ public class Classroom {
     private String name;
     @ManyToOne
     private School school;
+    private Integer capacity;
 }

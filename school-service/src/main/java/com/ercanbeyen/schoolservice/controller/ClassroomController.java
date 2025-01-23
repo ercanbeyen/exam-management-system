@@ -1,6 +1,6 @@
 package com.ercanbeyen.schoolservice.controller;
 
-import com.ercanbeyen.schoolservice.dto.ClassroomDto;
+import com.ercanbeyen.servicecommon.client.contract.ClassroomDto;
 import com.ercanbeyen.schoolservice.service.ClassroomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +20,12 @@ public class ClassroomController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClassroomDto> updateClassroom(@PathVariable String id, @RequestBody ClassroomDto request) {
+    public ResponseEntity<ClassroomDto> updateClassroom(@PathVariable("id") String id, @RequestBody ClassroomDto request) {
         return ResponseEntity.ok(classroomService.updateClassroom(id, request));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClassroomDto> getClassroom(@PathVariable String id) {
+    public ResponseEntity<ClassroomDto> getClassroom(@PathVariable("id") String id) {
         return ResponseEntity.ok(classroomService.getClassroom(id));
     }
 

@@ -19,4 +19,18 @@ public class ExamEvent {
     private ExamLocation location;
     @OneToMany(mappedBy = "examEvent")
     private List<ExamRegistration> examRegistrations;
+
+    @Override
+    public String toString() {
+        List<String> examRegistrationIds = examRegistrations.stream()
+                .map(ExamRegistration::getId)
+                .toList();
+
+        return "ExamEvent{" +
+                "id='" + id + '\'' +
+                ", exam=" + exam +
+                ", location=" + location +
+                ", examRegistrations=" + examRegistrationIds +
+                '}';
+    }
 }

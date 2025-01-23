@@ -1,6 +1,6 @@
 package com.ercanbeyen.schoolservice.service;
 
-import com.ercanbeyen.schoolservice.dto.ClassroomDto;
+import com.ercanbeyen.servicecommon.client.contract.ClassroomDto;
 
 import java.util.List;
 

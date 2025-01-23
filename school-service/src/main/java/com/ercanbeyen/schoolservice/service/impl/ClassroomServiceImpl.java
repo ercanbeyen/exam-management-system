@@ -1,6 +1,6 @@
 package com.ercanbeyen.schoolservice.service.impl;
 
-import com.ercanbeyen.schoolservice.dto.ClassroomDto;
+import com.ercanbeyen.servicecommon.client.contract.ClassroomDto;
 import com.ercanbeyen.schoolservice.entity.Classroom;
 import com.ercanbeyen.schoolservice.entity.School;
 import com.ercanbeyen.schoolservice.mapper.ClassroomMapper;
@@ -38,6 +38,7 @@ public class ClassroomServiceImpl implements ClassroomService {
 
         classroom.setName(request.name());
         classroom.setSchool(school);
+        classroom.setCapacity(request.capacity());
 
         return classroomMapper.entityToDto(classroomRepository.save(classroom));
     }

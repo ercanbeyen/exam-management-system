@@ -21,4 +21,19 @@ public class Exam {
     private ExamPeriod examPeriod;
     @OneToMany(mappedBy = "exam")
     private List<ExamEvent> examEvents;
+
+    @Override
+    public String toString() {
+        List<String> examEventsIds = examEvents.stream()
+                .map(ExamEvent::getId)
+                .toList();
+
+        return "Exam{" +
+                "id='" + id + '\'' +
+                ", subject='" + subject + '\'' +
+                ", registrationPeriod=" + registrationPeriod +
+                ", examPeriod=" + examPeriod +
+                ", examEvents=" + examEventsIds +
+                '}';
+    }
 }
