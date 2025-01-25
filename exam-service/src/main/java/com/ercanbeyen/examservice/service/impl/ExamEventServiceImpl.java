@@ -3,6 +3,7 @@ package com.ercanbeyen.examservice.service.impl;
 import com.ercanbeyen.examservice.dto.ExamEventDto;
 import com.ercanbeyen.examservice.dto.ExamLocationDto;
 import com.ercanbeyen.examservice.embeddable.ExamLocation;
+import com.ercanbeyen.examservice.embeddable.ExamPeriod;
 import com.ercanbeyen.examservice.entity.Exam;
 import com.ercanbeyen.examservice.entity.ExamEvent;
 import com.ercanbeyen.examservice.mapper.ExamEventMapper;
@@ -12,6 +13,7 @@ import com.ercanbeyen.examservice.service.ExamEventService;
 import com.ercanbeyen.examservice.service.ExamService;
 import com.ercanbeyen.servicecommon.client.SchoolServiceClient;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
+import com.ercanbeyen.servicecommon.client.exception.ResourceConflictException;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,8 +38,9 @@ public class ExamEventServiceImpl implements ExamEventService {
 
     @Override
     public ExamEventDto createExamEvent(ExamEventDto request, String username) {
-        ExamEvent constructExamEvent = constructExamEvent(null, request);
-        ExamEvent savedExamEvent = examEventRepository.save(constructExamEvent);
+        checkExamEventConflicts(request);
+        ExamEvent examEvent = constructExamEvent(null, request);
+        ExamEvent savedExamEvent = examEventRepository.save(examEvent);
 
         ExamEventDto examEventDto = examEventMapper.entityToDto(savedExamEvent);
         examEventNotificationService.sendToQueue(examEventDto, username);
@@ -46,6 +50,7 @@ public class ExamEventServiceImpl implements ExamEventService {
 
     @Override
     public ExamEventDto updateExamEvent(String id, ExamEventDto request, String username) {
+        checkExamEventConflicts(request);
         ExamEvent examEvent = constructExamEvent(id, request);
         return examEventMapper.entityToDto(examEventRepository.save(examEvent));
     }
@@ -107,5 +112,44 @@ public class ExamEventServiceImpl implements ExamEventService {
         examEvent.setLocation(examLocation);
 
         return examEvent;
+    }
+    
+    private void checkExamEventConflicts(ExamEventDto request) {
+        Exam exam = examService.findById(request.examId());
+        ExamLocation examLocation = new ExamLocation(request.location().schoolId(), request.location().classroomId());
+        ExamPeriod requestedExamPeriod = exam.getExamPeriod();
+
+        List<ExamEvent> examEvents = examEventRepository.findAllByExamLocationAndExamPeriod(examLocation, exam.getExamPeriod().getDate())
+                .stream()
+                .filter(examEvent -> {
+                    ExamPeriod examPeriod = examEvent.getExam().getExamPeriod();
+                    LocalTime startTime = examPeriod.getStartTime();
+                    LocalTime finishTime = examPeriod.getFinishTime();
+
+                    LocalTime requestedStartTime = requestedExamPeriod.getStartTime();
+                    LocalTime requestedFinishTime = requestedExamPeriod.getFinishTime();
+
+                    boolean exactTimeEqualityConflicts = requestedStartTime.equals(startTime) || requestedFinishTime.equals(finishTime);
+                    boolean justRequestedStartTimeConflicts  = requestedStartTime.isAfter(startTime)  && requestedFinishTime.isAfter(finishTime)  && requestedStartTime.isBefore(finishTime);   // start requestedStart finish requestedFinish
+                    boolean justRequestedFinishTimeConflicts = requestedStartTime.isBefore(startTime) && requestedFinishTime.isBefore(finishTime) && requestedFinishTime.isAfter(startTime);   // requestedStart start requestedFinish finish
+                    boolean bothRequestedTimesInnerConflict  = requestedStartTime.isAfter(startTime)  && requestedFinishTime.isBefore(finishTime);                                             // start requestedStart requestedFinish finish
+                    boolean bothRequestedTimesOuterConflict  = requestedStartTime.isBefore(startTime) && requestedFinishTime.isAfter(finishTime);                                              // requestedStart start finish requestedFinish
+
+                    log.info("exactTimeEqualityConflicts: {}, justRequestedStartTimeConflicts: {}, justRequestedFinishTimeConflicts: {}, bothRequestedTimesInnerConflict: {}, bothRequestedTimesOuterConflict: {}",
+                            exactTimeEqualityConflicts, justRequestedStartTimeConflicts, justRequestedFinishTimeConflicts, bothRequestedTimesInnerConflict, bothRequestedTimesOuterConflict);
+
+                    return exactTimeEqualityConflicts || justRequestedStartTimeConflicts || justRequestedFinishTimeConflicts || bothRequestedTimesInnerConflict || bothRequestedTimesOuterConflict;
+                })
+                .toList();
+
+        if (!examEvents.isEmpty()) {
+            List<String> conflictedExamEventIds = examEvents.stream()
+                    .map(ExamEvent::getId)
+                    .toList();
+
+            throw new ResourceConflictException("Requested exam event conflicts wih exam events " + conflictedExamEventIds);
+        }
+
+        log.info("There is no any conflicts between any exam events");
     }
 }

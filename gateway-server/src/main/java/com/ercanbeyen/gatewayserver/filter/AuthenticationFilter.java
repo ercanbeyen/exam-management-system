@@ -35,7 +35,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             ServerHttpRequest serverHttpRequest = null;
             if (routeValidator.isSecured.test(exchange.getRequest())) {
                 if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) { // header contains token or not
-                    throw new UnauthorizedUserException("AuthenticationFilter::apply exception: Missing authorization header");
+                    throw new UnauthorizedUserException("Missing authorization header");
                 }
 
                 String authHeader = Objects.requireNonNull(
