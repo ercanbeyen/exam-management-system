@@ -32,7 +32,7 @@ spring:
         - id: SCHOOL-SERVICE
           uri: lb://SCHOOL-SERVICE
           predicates:
-            - Path=/schools/**, /classrooms/**
+            - Path=/schools/**
           filters:
             - AuthenticationFilter=ADMIN
             - AddRequestHeader=X-Client,web

@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Embeddable
 public class ExamLocation {
-    private Integer schoolId;
-    private String classroomId;
+    private String schoolId;
+    private String classroomName;
 }

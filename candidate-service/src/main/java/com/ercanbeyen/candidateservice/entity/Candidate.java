@@ -17,5 +17,5 @@ public class Candidate {
     private String fullName;
     private int age;
     private String gender;
-    private Integer schoolId;
+    private String schoolId;
 }

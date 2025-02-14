@@ -1,18 +1,14 @@
 package com.ercanbeyen.schoolservice.entity;
 
 
-import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
-@Entity
-@Table(name = "classrooms")
 public class Classroom {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
     private String name;
-    @ManyToOne
-    private School school;
     private Integer capacity;
 }

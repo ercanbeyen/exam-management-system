@@ -98,15 +98,15 @@ public class ExamEventServiceImpl implements ExamEventService {
 
         assert schoolDto != null;
 
-        boolean classroomIdExists = schoolDto.classroomIds()
+        boolean classroomIdExists = schoolDto.classroomDtos()
                 .stream()
-                .anyMatch(classroomId -> classroomId.equals(requestedLocation.classroomId()));
+                .anyMatch(classroomDto -> classroomDto.name().equals(requestedLocation.classroomName()));
 
         if (!classroomIdExists) {
-            throw new ResourceNotFoundException(String.format("Classroom %s does not found inside school %d", requestedLocation.classroomId(), requestedLocation.schoolId()));
+            throw new ResourceNotFoundException(String.format("Classroom %s does not found inside school %s", requestedLocation.classroomName(), requestedLocation.schoolId()));
         }
 
-        ExamLocation examLocation = new ExamLocation(requestedLocation.schoolId(), requestedLocation.classroomId());
+        ExamLocation examLocation = new ExamLocation(requestedLocation.schoolId(), requestedLocation.classroomName());
 
         examEvent.setExam(exam);
         examEvent.setLocation(examLocation);
@@ -116,7 +116,7 @@ public class ExamEventServiceImpl implements ExamEventService {
     
     private void checkExamEventConflicts(ExamEventDto request) {
         Exam exam = examService.findById(request.examId());
-        ExamLocation examLocation = new ExamLocation(request.location().schoolId(), request.location().classroomId());
+        ExamLocation examLocation = new ExamLocation(request.location().schoolId(), request.location().classroomName());
         ExamPeriod requestedExamPeriod = exam.getExamPeriod();
 
         List<ExamEvent> examEvents = examEventRepository.findAllByExamLocationAndExamPeriod(examLocation, exam.getExamPeriod().getDate())

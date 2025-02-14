@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +22,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -41,6 +41,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final RestTemplate restTemplate;
 
+    @Transactional
     public String register(RegistrationRequest request) {
         userCredentialService.checkUserCredentialByUsername(request.username());
         userCredentialService.createUserCredential(request);
@@ -55,6 +56,7 @@ public class AuthService {
         return "User is successfully registered";
     }
 
+    @Transactional
     public void login(LoginRequest loginRequest, HttpServletResponse servletResponse) {
         authenticateUser(loginRequest);
 

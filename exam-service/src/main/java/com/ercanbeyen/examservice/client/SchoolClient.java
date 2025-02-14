@@ -19,8 +19,8 @@ public class SchoolClient {
 
     public void checkClassroomCapacityForExamRegistration(ExamEvent examEvent) {
         ExamLocation examLocation = examEvent.getLocation();
-        String classroomId = examLocation.getClassroomId();
-        ResponseEntity<ClassroomDto> schoolServiceResponse = schoolServiceClient.getClassroom(classroomId);
+        String classroomName = examLocation.getClassroomName();
+        ResponseEntity<ClassroomDto> schoolServiceResponse = schoolServiceClient.getClassroom(examLocation.getSchoolId(), classroomName);
 
         assert schoolServiceResponse.getBody() != null;
         ClassroomDto classroomDto = schoolServiceResponse.getBody();
@@ -37,9 +37,9 @@ public class SchoolClient {
         }
 
         if (numberOfRegistrations == classroomCapacity) {
-            throw new ResourceConflictException("Capacity is full for classroom " + classroomId);
+            throw new ResourceConflictException("Capacity is full for classroom " + classroomName);
         }
 
-        log.info("Classroom {} is available for registration to exam {}", classroomId, subject);
+        log.info("Classroom {} is available for registration to exam {}", classroomName, subject);
     }
 }

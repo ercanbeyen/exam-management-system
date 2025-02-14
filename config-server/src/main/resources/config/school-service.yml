@@ -4,17 +4,12 @@ server:
 spring:
   application:
     name: SCHOOL-SERVICE
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/school_service
-    username: root
-    password: password
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-      properties:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+  data:
+    mongodb:
+      database: school_service
+      port: 27017
+      host: localhost
+      auto-index-creation: true
   zipkin:
     base-url: http://localhost:9411/
   boot:
