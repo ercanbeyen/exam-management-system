@@ -20,7 +20,7 @@ public class SchoolClient {
     public void checkClassroomCapacityForExamRegistration(ExamEvent examEvent) {
         ExamLocation examLocation = examEvent.getLocation();
         String classroomName = examLocation.getClassroomName();
-        ResponseEntity<ClassroomDto> schoolServiceResponse = schoolServiceClient.getClassroom(examLocation.getSchoolId(), classroomName);
+        ResponseEntity<ClassroomDto> schoolServiceResponse = schoolServiceClient.getClassroom(examLocation.getSchoolName(), classroomName);
 
         assert schoolServiceResponse.getBody() != null;
         ClassroomDto classroomDto = schoolServiceResponse.getBody();

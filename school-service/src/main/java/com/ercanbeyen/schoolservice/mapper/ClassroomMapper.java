@@ -1,7 +1,7 @@
 package com.ercanbeyen.schoolservice.mapper;
 
 import com.ercanbeyen.servicecommon.client.contract.ClassroomDto;
-import com.ercanbeyen.schoolservice.entity.Classroom;
+import com.ercanbeyen.schoolservice.embeddable.Classroom;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

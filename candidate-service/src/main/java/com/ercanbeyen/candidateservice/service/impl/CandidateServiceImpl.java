@@ -31,7 +31,7 @@ public class CandidateServiceImpl implements CandidateService {
         checkSchool(request);
 
         Candidate candidate = candidateMapper.dtoToEntity(request);
-        candidate.setSchoolId(request.schoolId());
+        candidate.setSchoolName(request.schoolName());
 
         return candidateMapper.entityToDto(candidateRepository.save(candidate));
     }
@@ -43,7 +43,7 @@ public class CandidateServiceImpl implements CandidateService {
 
         checkSchool(request);
 
-        candidate.setSchoolId(request.schoolId());
+        candidate.setSchoolName(request.schoolName());
         candidate.setFullName(request.fullName());
         candidate.setAge(request.age());
         candidate.setGender(request.gender());
@@ -101,8 +101,8 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     private void checkSchool(CandidateDto request) {
-        ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(request.schoolId());
+        ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(request.schoolName());
         log.debug(LogMessage.CLIENT_SERVICE_RESPONSE, "School", schoolServiceResponse);
-        log.info(LogMessage.RESOURCE_FOUND, "School", request.schoolId());
+        log.info(LogMessage.RESOURCE_FOUND, "School", request.schoolName());
     }
 }

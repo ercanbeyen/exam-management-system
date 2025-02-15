@@ -9,8 +9,8 @@ import java.util.List;
 public interface SchoolService {
     SchoolDto createSchool(SchoolDto request);
     SchoolDto updateSchool(String id, SchoolDto request);
-    SchoolDto getSchool(String id);
-    ClassroomDto getClassroom(String id, String classroomName);
+    SchoolDto getSchool(String name);
+    ClassroomDto getClassroom(String name, String classroomName);
     List<SchoolDto> getSchools();
     String deleteSchool(String id);
     School findById(String id);

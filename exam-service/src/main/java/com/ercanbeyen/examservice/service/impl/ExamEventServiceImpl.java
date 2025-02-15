@@ -93,7 +93,7 @@ public class ExamEventServiceImpl implements ExamEventService {
         Exam exam = examService.findById(request.examId());
         ExamLocationDto requestedLocation = request.location();
 
-        ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(requestedLocation.schoolId());
+        ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(requestedLocation.schoolName());
         SchoolDto schoolDto = schoolServiceResponse.getBody();
 
         assert schoolDto != null;
@@ -103,10 +103,10 @@ public class ExamEventServiceImpl implements ExamEventService {
                 .anyMatch(classroomDto -> classroomDto.name().equals(requestedLocation.classroomName()));
 
         if (!classroomIdExists) {
-            throw new ResourceNotFoundException(String.format("Classroom %s does not found inside school %s", requestedLocation.classroomName(), requestedLocation.schoolId()));
+            throw new ResourceNotFoundException(String.format("Classroom %s does not found inside school %s", requestedLocation.classroomName(), requestedLocation.schoolName()));
         }
 
-        ExamLocation examLocation = new ExamLocation(requestedLocation.schoolId(), requestedLocation.classroomName());
+        ExamLocation examLocation = new ExamLocation(requestedLocation.schoolName(), requestedLocation.classroomName());
 
         examEvent.setExam(exam);
         examEvent.setLocation(examLocation);
@@ -116,7 +116,7 @@ public class ExamEventServiceImpl implements ExamEventService {
     
     private void checkExamEventConflicts(ExamEventDto request) {
         Exam exam = examService.findById(request.examId());
-        ExamLocation examLocation = new ExamLocation(request.location().schoolId(), request.location().classroomName());
+        ExamLocation examLocation = new ExamLocation(request.location().schoolName(), request.location().classroomName());
         ExamPeriod requestedExamPeriod = exam.getExamPeriod();
 
         List<ExamEvent> examEvents = examEventRepository.findAllByExamLocationAndExamPeriod(examLocation, exam.getExamPeriod().getDate())

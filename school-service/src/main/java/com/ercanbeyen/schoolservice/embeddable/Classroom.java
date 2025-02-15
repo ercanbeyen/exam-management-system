@@ -1,4 +1,4 @@
-package com.ercanbeyen.schoolservice.entity;
+package com.ercanbeyen.schoolservice.embeddable;
 
 
 import lombok.AllArgsConstructor;

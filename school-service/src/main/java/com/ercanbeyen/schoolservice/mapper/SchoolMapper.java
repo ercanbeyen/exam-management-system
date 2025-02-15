@@ -1,6 +1,6 @@
 package com.ercanbeyen.schoolservice.mapper;
 
-import com.ercanbeyen.schoolservice.entity.Classroom;
+import com.ercanbeyen.schoolservice.embeddable.Classroom;
 import com.ercanbeyen.servicecommon.client.contract.ClassroomDto;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.schoolservice.entity.School;

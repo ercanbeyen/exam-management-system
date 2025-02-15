@@ -14,7 +14,7 @@ public class GlobalErrorCode {
     public static final String SCHOOL_GENERIC_ERROR = "SCHOOL-SERVICE-1000";
     public static final String SCHOOL_BAD_REQUEST_ERROR = "SCHOOL-SERVICE-1001";
     public static final String SCHOOL_NOT_FOUND_ERROR = "SCHOOL-SERVICE-1002";
-    public static final String SCHOOL_FORBIDDEN_ERROR = "SCHOOL-SERVICE-1003";
+    public static final String SCHOOL_CONFLICT_ERROR = "SCHOOL-SERVICE-1004";
 
     public static final String NOTIFICATION_GENERIC_ERROR = "NOTIFICATION-SERVICE-1000";
     public static final String NOTIFICATION_BAD_REQUEST_ERROR = "NOTIFICATION-SERVICE-1001";

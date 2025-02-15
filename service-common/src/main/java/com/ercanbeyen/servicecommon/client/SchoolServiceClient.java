@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "school-service", configuration = FeignConfig.class)
 public interface SchoolServiceClient {
-    @GetMapping("/schools/{id}")
-    ResponseEntity<SchoolDto> getSchool(@PathVariable("id") String id);
-    @GetMapping("/schools/{id}/classroomDtos/{classroom}")
-    ResponseEntity<ClassroomDto> getClassroom(@PathVariable("id") String id, @PathVariable("classroom") String classroomName);
+    @GetMapping("/schools/{name}")
+    ResponseEntity<SchoolDto> getSchool(@PathVariable String name);
+    @GetMapping("/schools/{name}/classrooms/{classroom}")
+    ResponseEntity<ClassroomDto> getClassroom(@PathVariable String name, @PathVariable("classroom") String classroomName);
 }

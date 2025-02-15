@@ -41,7 +41,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final RestTemplate restTemplate;
 
-    @Transactional
+    //@Transactional
     public String register(RegistrationRequest request) {
         userCredentialService.checkUserCredentialByUsername(request.username());
         userCredentialService.createUserCredential(request);
@@ -154,7 +154,7 @@ public class AuthService {
     private void createCandidate(RegistrationRequest request) throws URISyntaxException {
         URI uri = new URI("http://localhost:" + 8082 + "/candidates");
 
-        CandidateDto requestedCandidate = new CandidateDto(null, request.username(), request.fullName(), request.age(), request.gender(), request.schoolId());
+        CandidateDto requestedCandidate = new CandidateDto(null, request.username(), request.fullName(), request.age(), request.gender(), request.schoolName());
         restTemplate.postForObject(uri, requestedCandidate, CandidateDto.class);
     }
 }

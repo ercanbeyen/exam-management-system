@@ -27,16 +27,16 @@ public class SchoolController {
         return ResponseEntity.ok(schoolService.updateSchool(id, request));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<SchoolDto> getSchool(@PathVariable String id) {
-        SchoolDto school = schoolService.getSchool(id);
+    @GetMapping("/{name}")
+    public ResponseEntity<SchoolDto> getSchool(@PathVariable String name) {
+        SchoolDto school = schoolService.getSchool(name);
         log.info("School is successfully fetched");
         return ResponseEntity.ok(school);
     }
 
-    @GetMapping("/{id}/classroomDtos/{classroom}")
-    public ResponseEntity<ClassroomDto> getClassroom(@PathVariable String id, @PathVariable("classroom") String classroomName) {
-        ClassroomDto classroom = schoolService.getClassroom(id, classroomName);
+    @GetMapping("/{name}/classrooms/{classroom}")
+    public ResponseEntity<ClassroomDto> getClassroom(@PathVariable String name, @PathVariable("classroom") String classroomName) {
+        ClassroomDto classroom = schoolService.getClassroom(name, classroomName);
         log.info("Classroom is successfully fetched");
         return ResponseEntity.ok(classroom);
     }
