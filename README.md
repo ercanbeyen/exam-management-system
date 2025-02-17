@@ -28,7 +28,7 @@ Server:
 
 ### Tech Stack
 ---
-- Java 17
+- Java 21
 - Spring Boot
 - Spring Cloud
 - Spring Security
@@ -55,12 +55,12 @@ $ docker pull openzipkin/zipkin
 
 Then you should run the following applications in order
 
-1) Config Server
+1) Eureka Server
 2) Zipkin Server
-3) Eureka Server
+3) Config Server
 4) Admin Server
-5) Auth Service
-6) Gateway Server
+5) Gateway Server
+6) Auth Service
 7) School Service
 8) Candidate Service
 9) Exam Service
