@@ -2,6 +2,7 @@ package com.ercanbeyen.examservice.service.impl;
 
 import com.ercanbeyen.examservice.client.CandidateClient;
 import com.ercanbeyen.examservice.client.SchoolClient;
+import com.ercanbeyen.examservice.dto.ExamEventDto;
 import com.ercanbeyen.examservice.dto.ExamRegistrationDto;
 import com.ercanbeyen.examservice.embeddable.RegistrationPeriod;
 import com.ercanbeyen.examservice.entity.Exam;
@@ -13,6 +14,7 @@ import com.ercanbeyen.examservice.repository.ExamRegistrationRepository;
 import com.ercanbeyen.examservice.service.ExamEventService;
 import com.ercanbeyen.examservice.service.ExamRegistrationNotificationService;
 import com.ercanbeyen.examservice.service.ExamRegistrationService;
+import com.ercanbeyen.examservice.service.ExamService;
 import com.ercanbeyen.servicecommon.client.exception.ResourceConflictException;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.logging.LogMessage;
@@ -29,6 +31,7 @@ import java.util.List;
 public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     private final ExamRegistrationRepository examRegistrationRepository;
     private final ExamRegistrationMapper examRegistrationMapper;
+    private final ExamService examService;
     private final ExamEventService examEventService;
     private final ExamRegistrationNotificationService examRegistrationNotificationService;
     private final CandidateClient candidateClient;
@@ -36,7 +39,10 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
 
     @Override
     public ExamRegistrationDto createExamRegistration(ExamRegistrationDto request, String username) {
-        ExamEvent examEvent = examEventService.findById(request.examEventId());
+        ExamEventDto examEventDto = request.examEventDto();
+        Exam exam = examService.findBySubject(examEventDto.examSubject());
+        ExamEvent examEvent = examEventService.findExamEventBySubjectAndLocationAndPeriod(
+                examEventDto.examSubject(), examEventDto.location(), exam.getExamPeriod());
 
         checkExamRegistrationPeriod(examEvent.getExam());
 
@@ -71,18 +77,21 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     @Override
     public ExamRegistrationDto updateExamRegistration(String id, ExamRegistrationDto request, String username) {
         ExamRegistration examRegistration = findById(id);
+        Exam exam = examRegistration.getExamEvent().getExam();
 
-        checkExamRegistrationPeriod(examRegistration.getExamEvent().getExam());
+        checkExamRegistrationPeriod(exam);
 
-        ExamEvent examEvent = examEventService.findById(request.examEventId());
+        ExamEventDto examEventDto = request.examEventDto();
+        ExamEvent requestedExamEvent = examEventService.findExamEventBySubjectAndLocationAndPeriod(
+                examEventDto.examSubject(), examEventDto.location(), exam.getExamPeriod());
 
         String candidateId = request.candidateId();
         candidateClient.checkCandidate(username, candidateId);
 
-        if (examEvent.getId().equals(examRegistration.getExamEvent().getId())) {
+        if (!requestedExamEvent.getId().equals(examRegistration.getExamEvent().getId())) {
             log.info("Classroom of candidate may check. Classroom capacity must be checked before update");
-            schoolClient.checkClassroomCapacityForExamRegistration(examEvent);
-            examRegistration.setExamEvent(examEvent);
+            schoolClient.checkClassroomCapacityForExamRegistration(requestedExamEvent);
+            examRegistration.setExamEvent(requestedExamEvent);
         }
 
         examRegistration.setUpdatedAt(LocalDateTime.now());

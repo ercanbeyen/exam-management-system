@@ -12,4 +12,5 @@ public interface ExamService {
     List<ExamDto> getExams();
     String deleteExam(String id);
     Exam findById(String id);
+    Exam findBySubject(String subject);
 }

@@ -14,6 +14,7 @@ public class Exam {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+    @Column(unique = true, nullable = false)
     private String subject;
     @Embedded
     private RegistrationPeriod registrationPeriod;

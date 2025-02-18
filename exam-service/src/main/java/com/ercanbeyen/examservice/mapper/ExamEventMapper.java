@@ -9,7 +9,7 @@ import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
 public interface ExamEventMapper {
-    @Mapping(target = "examId", source = "exam.id")
+    @Mapping(target = "examSubject", source = "exam.subject")
     @Mapping(source = "examRegistrations", target = "examRegistrationIds", qualifiedByName = "entityToId")
     ExamEventDto entityToDto(ExamEvent examEvent);
     ExamEvent dtoToEntity(ExamEventDto examEventDto);

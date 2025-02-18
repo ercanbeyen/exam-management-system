@@ -85,12 +85,19 @@ public class ExamEventServiceImpl implements ExamEventService {
         return examEvent;
     }
 
+    @Override
+    public ExamEvent findExamEventBySubjectAndLocationAndPeriod(String examSubject, ExamLocationDto examLocation, ExamPeriod examPeriod) {
+        ExamLocation requestedExamLocation = new ExamLocation(examLocation.schoolName(), examLocation.classroomName());
+        return examEventRepository.findByExamSubjectAndExamLocationAndExamPeriod(examSubject, requestedExamLocation, examPeriod.getDate())
+                .orElseThrow(() -> new ResourceNotFoundException("Exam event not found for exam " + examSubject + " on " + examLocation + " at " +  examPeriod));
+    }
+
     private ExamEvent constructExamEvent(String id, ExamEventDto request) {
         ExamEvent examEvent = Optional.ofNullable(id).isPresent()
                 ? findById(id)
                 : examEventMapper.dtoToEntity(request);
 
-        Exam exam = examService.findById(request.examId());
+        Exam exam = examService.findBySubject(request.examSubject());
         ExamLocationDto requestedLocation = request.location();
 
         ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(requestedLocation.schoolName());
@@ -115,8 +122,9 @@ public class ExamEventServiceImpl implements ExamEventService {
     }
     
     private void checkExamEventConflicts(ExamEventDto request) {
-        Exam exam = examService.findById(request.examId());
-        ExamLocation examLocation = new ExamLocation(request.location().schoolName(), request.location().classroomName());
+        Exam exam = examService.findBySubject(request.examSubject());
+        ExamLocationDto examLocationDto = request.location();
+        ExamLocation examLocation = new ExamLocation(examLocationDto.schoolName(), examLocationDto.classroomName());
         ExamPeriod requestedExamPeriod = exam.getExamPeriod();
 
         List<ExamEvent> examEvents = examEventRepository.findAllByExamLocationAndExamPeriod(examLocation, exam.getExamPeriod().getDate())

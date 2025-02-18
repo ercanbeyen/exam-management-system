@@ -14,6 +14,7 @@ public class ExamEvent {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     @ManyToOne
+    @JoinColumn(name = "exam_subject", referencedColumnName = "subject")
     private Exam exam;
     @Embedded
     private ExamLocation location;
