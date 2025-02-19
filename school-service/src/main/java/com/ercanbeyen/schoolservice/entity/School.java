@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -22,5 +22,5 @@ public class School {
     private String name;
     private String location;
     private String owner;
-    private List<Classroom> classrooms;
+    private Set<Classroom> classrooms;
 }

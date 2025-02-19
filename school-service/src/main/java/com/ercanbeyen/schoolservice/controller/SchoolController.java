@@ -1,5 +1,6 @@
 package com.ercanbeyen.schoolservice.controller;
 
+import com.ercanbeyen.schoolservice.validator.SchoolValidator;
 import com.ercanbeyen.servicecommon.client.contract.ClassroomDto;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.schoolservice.service.SchoolService;
@@ -19,11 +20,13 @@ public class SchoolController {
 
     @PostMapping
     public ResponseEntity<SchoolDto> createSchool(@RequestBody SchoolDto request) {
+        SchoolValidator.checkClassrooms(request);
         return ResponseEntity.ok(schoolService.createSchool(request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<SchoolDto> updateSchool(@PathVariable String id, @RequestBody SchoolDto request) {
+        SchoolValidator.checkClassrooms(request);
         return ResponseEntity.ok(schoolService.updateSchool(id, request));
     }
 

@@ -4,17 +4,16 @@ import com.ercanbeyen.examservice.client.CandidateClient;
 import com.ercanbeyen.examservice.client.SchoolClient;
 import com.ercanbeyen.examservice.dto.ExamEventDto;
 import com.ercanbeyen.examservice.dto.ExamRegistrationDto;
-import com.ercanbeyen.examservice.embeddable.RegistrationPeriod;
 import com.ercanbeyen.examservice.entity.Exam;
 import com.ercanbeyen.examservice.entity.ExamEvent;
 import com.ercanbeyen.examservice.entity.ExamRegistration;
-import com.ercanbeyen.examservice.exception.TimeExpiredException;
 import com.ercanbeyen.examservice.mapper.ExamRegistrationMapper;
 import com.ercanbeyen.examservice.repository.ExamRegistrationRepository;
 import com.ercanbeyen.examservice.service.ExamEventService;
 import com.ercanbeyen.examservice.service.ExamRegistrationNotificationService;
 import com.ercanbeyen.examservice.service.ExamRegistrationService;
 import com.ercanbeyen.examservice.service.ExamService;
+import com.ercanbeyen.examservice.validator.ExamRegistrationValidator;
 import com.ercanbeyen.servicecommon.client.exception.ResourceConflictException;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.logging.LogMessage;
@@ -44,7 +43,7 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         ExamEvent examEvent = examEventService.findExamEventBySubjectAndLocationAndPeriod(
                 examEventDto.examSubject(), examEventDto.location(), exam.getExamPeriod());
 
-        checkExamRegistrationPeriod(examEvent.getExam());
+        ExamRegistrationValidator.checkExamRegistrationPeriod(examEvent.getExam());
 
         String candidateId = request.candidateId();
         candidateClient.checkCandidate(username, candidateId);
@@ -79,7 +78,7 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         ExamRegistration examRegistration = findById(id);
         Exam exam = examRegistration.getExamEvent().getExam();
 
-        checkExamRegistrationPeriod(exam);
+        ExamRegistrationValidator.checkExamRegistrationPeriod(exam);
 
         ExamEventDto examEventDto = request.examEventDto();
         ExamEvent requestedExamEvent = examEventService.findExamEventBySubjectAndLocationAndPeriod(
@@ -120,7 +119,7 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     @Override
     public String deleteExamRegistration(String id, String username) {
         ExamRegistration examRegistration = findById(id);
-        checkExamRegistrationPeriod(examRegistration.getExamEvent().getExam());
+        ExamRegistrationValidator.checkExamRegistrationPeriod(examRegistration.getExamEvent().getExam());
         candidateClient.checkCandidate(username, examRegistration.getCandidateId());
 
         examRegistrationRepository.delete(examRegistration);
@@ -134,20 +133,5 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         log.info(LogMessage.RESOURCE_FOUND, "Exam registration", id);
 
         return examRegistration;
-    }
-
-    private static void checkExamRegistrationPeriod(Exam exam) {
-        RegistrationPeriod registrationPeriod = exam.getRegistrationPeriod();
-        LocalDateTime now = LocalDateTime.now();
-
-        if (registrationPeriod.getBeginAt().isAfter(now)) {
-            throw new TimeExpiredException("Registration period for exam " + exam.getSubject() + " has not been started yet");
-        }
-
-        if (registrationPeriod.getEndAt().isBefore(now)) {
-            throw new TimeExpiredException("Registration period for exam " + exam.getSubject() + " has already been ended");
-        }
-
-        log.info("Current time is in registration period for the exam");
     }
 }

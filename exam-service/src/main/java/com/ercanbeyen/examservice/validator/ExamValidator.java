@@ -1,4 +1,4 @@
-package com.ercanbeyen.examservice.util;
+package com.ercanbeyen.examservice.validator;
 
 import com.ercanbeyen.examservice.dto.ExamDto;
 import com.ercanbeyen.examservice.dto.ExamPeriodDto;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @UtilityClass
 @Slf4j
-public class TimeUtil {
+public class ExamValidator {
     public void checkExamTime(ExamDto request) {
         checkRegistrationPeriod(request);
         checkExamPeriod(request);

@@ -15,8 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +43,7 @@ public class SchoolServiceImpl implements SchoolService {
         school.setName(request.name());
         school.setLocation(request.location());
         school.setOwner(request.owner());
-        List<Classroom> classrooms = new ArrayList<>();
+        Set<Classroom> classrooms = new HashSet<>();
 
         request.classroomDtos()
                         .forEach(classroomDto -> classrooms.add(classroomMapper.dtoToEntity(classroomDto)));

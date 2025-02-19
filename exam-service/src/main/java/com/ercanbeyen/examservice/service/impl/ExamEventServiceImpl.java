@@ -35,7 +35,6 @@ public class ExamEventServiceImpl implements ExamEventService {
     private final ExamService examService;
     private final ExamEventNotificationService examEventNotificationService;
 
-
     @Override
     public ExamEventDto createExamEvent(ExamEventDto request, String username) {
         checkExamEventConflicts(request);
