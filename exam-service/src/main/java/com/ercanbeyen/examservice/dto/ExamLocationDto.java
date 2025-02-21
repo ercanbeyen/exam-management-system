@@ -1,5 +1,11 @@
 package com.ercanbeyen.examservice.dto;
 
-public record ExamLocationDto(String schoolName, String classroomName) {
+import jakarta.validation.constraints.NotBlank;
+
+public record ExamLocationDto(
+        @NotBlank(message = "School name is mandatory")
+        String schoolName,
+        @NotBlank(message = "Classroom name is mandatory")
+        String classroomName) {
 
 }

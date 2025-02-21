@@ -1,5 +1,13 @@
 package com.ercanbeyen.authservice.dto.request;
 
-public record RegistrationRequest(String username, String password, String fullName, int age, String gender, String schoolName) {
+import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+
+public record RegistrationRequest(
+        @Valid
+        CandidateDto candidateDto,
+        @NotBlank(message = "Password is mandatory")
+        String password) {
 
 }

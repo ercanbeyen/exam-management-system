@@ -4,6 +4,7 @@ import com.ercanbeyen.examservice.dto.ExamDto;
 import com.ercanbeyen.examservice.service.ExamService;
 import com.ercanbeyen.examservice.client.AuthClient;
 import com.ercanbeyen.examservice.validator.ExamValidator;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,14 +19,14 @@ public class ExamController {
     private final AuthClient authClient;
 
     @PostMapping
-    public ResponseEntity<ExamDto> createExam(@RequestBody ExamDto request, @RequestHeader("loggedInUser") String username) {
+    public ResponseEntity<ExamDto> createExam(@RequestBody @Valid ExamDto request, @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);
         ExamValidator.checkExamTime(request);
         return ResponseEntity.ok(examService.createExam(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ExamDto> updateExam(@PathVariable String id, @RequestBody ExamDto request, @RequestHeader("loggedInUser") String username) {
+    public ResponseEntity<ExamDto> updateExam(@PathVariable String id, @RequestBody @Valid ExamDto request, @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);
         ExamValidator.checkExamTime(request);
         return ResponseEntity.ok(examService.updateExam(id, request));

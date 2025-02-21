@@ -4,6 +4,7 @@ import com.ercanbeyen.schoolservice.validator.SchoolValidator;
 import com.ercanbeyen.servicecommon.client.contract.ClassroomDto;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.schoolservice.service.SchoolService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +20,13 @@ public class SchoolController {
     private final SchoolService schoolService;
 
     @PostMapping
-    public ResponseEntity<SchoolDto> createSchool(@RequestBody SchoolDto request) {
+    public ResponseEntity<SchoolDto> createSchool(@RequestBody @Valid SchoolDto request) {
         SchoolValidator.checkClassrooms(request);
         return ResponseEntity.ok(schoolService.createSchool(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SchoolDto> updateSchool(@PathVariable String id, @RequestBody SchoolDto request) {
+    public ResponseEntity<SchoolDto> updateSchool(@PathVariable String id, @RequestBody @Valid SchoolDto request) {
         SchoolValidator.checkClassrooms(request);
         return ResponseEntity.ok(schoolService.updateSchool(id, request));
     }

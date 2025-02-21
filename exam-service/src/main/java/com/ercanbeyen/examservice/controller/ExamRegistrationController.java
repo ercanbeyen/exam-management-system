@@ -3,6 +3,7 @@ package com.ercanbeyen.examservice.controller;
 import com.ercanbeyen.examservice.dto.ExamRegistrationDto;
 import com.ercanbeyen.examservice.service.ExamRegistrationService;
 import com.ercanbeyen.examservice.client.AuthClient;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +18,12 @@ public class ExamRegistrationController {
     private final AuthClient authClient;
 
     @PostMapping
-    public ResponseEntity<ExamRegistrationDto> createExamRegistration(@RequestBody ExamRegistrationDto request, @RequestHeader("loggedInUser") String username) {
+    public ResponseEntity<ExamRegistrationDto> createExamRegistration(@RequestBody @Valid ExamRegistrationDto request, @RequestHeader("loggedInUser") String username) {
         return ResponseEntity.ok(examRegistrationService.createExamRegistration(request, username));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ExamRegistrationDto> updateExamRegistration(@PathVariable String id, @RequestBody ExamRegistrationDto request, @RequestHeader("loggedInUser") String username) {
+    public ResponseEntity<ExamRegistrationDto> updateExamRegistration(@PathVariable String id, @RequestBody @Valid ExamRegistrationDto request, @RequestHeader("loggedInUser") String username) {
         return ResponseEntity.ok(examRegistrationService.updateExamRegistration(id, request, username));
     }
 

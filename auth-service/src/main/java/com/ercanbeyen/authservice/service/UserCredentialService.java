@@ -25,7 +25,7 @@ public class UserCredentialService {
         UserCredential userCredential = new UserCredential();
         String encryptedPassword = passwordEncoder.encode(request.password());
 
-        userCredential.setUsername(request.username());
+        userCredential.setUsername(request.candidateDto().username());
         userCredential.setPassword(encryptedPassword);
         userCredential.setRoles(List.of(Role.USER.toString()));
 

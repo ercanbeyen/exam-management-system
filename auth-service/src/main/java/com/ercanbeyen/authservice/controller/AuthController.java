@@ -7,6 +7,7 @@ import com.ercanbeyen.authservice.entity.UserCredential;
 import com.ercanbeyen.authservice.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,14 +24,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<MessageResponse> registerUser(@RequestBody RegistrationRequest request) {
+    public ResponseEntity<MessageResponse> registerUser(@RequestBody @Valid RegistrationRequest request) {
         String message = authService.register(request);
         MessageResponse response = new MessageResponse(message);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> loginUser(@RequestBody LoginRequest request, HttpServletResponse servletResponse) {
+    public ResponseEntity<Void> loginUser(@RequestBody @Valid LoginRequest request, HttpServletResponse servletResponse) {
         authService.login(request, servletResponse);
         return ResponseEntity.ok()
                 .build();

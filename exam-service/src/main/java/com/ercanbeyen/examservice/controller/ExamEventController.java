@@ -3,6 +3,7 @@ package com.ercanbeyen.examservice.controller;
 import com.ercanbeyen.examservice.dto.ExamEventDto;
 import com.ercanbeyen.examservice.service.ExamEventService;
 import com.ercanbeyen.examservice.client.AuthClient;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,13 +18,13 @@ public class ExamEventController {
     private final AuthClient authClient;
 
     @PostMapping
-    public ResponseEntity<ExamEventDto> createExamEvent(@RequestBody ExamEventDto request, @RequestHeader("loggedInUser") String username) {
+    public ResponseEntity<ExamEventDto> createExamEvent(@RequestBody @Valid ExamEventDto request, @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);
         return ResponseEntity.ok(examEventService.createExamEvent(request, username));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ExamEventDto> updateExamEvent(@PathVariable String id, @RequestBody ExamEventDto request, @RequestHeader("loggedInUser") String username) {
+    public ResponseEntity<ExamEventDto> updateExamEvent(@PathVariable String id, @RequestBody @Valid ExamEventDto request, @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);
         return ResponseEntity.ok(examEventService.updateExamEvent(id, request, username));
     }

@@ -1,8 +1,8 @@
 package com.ercanbeyen.candidateservice.service.impl;
 
+import com.ercanbeyen.candidateservice.client.SchoolClient;
 import com.ercanbeyen.candidateservice.entity.Candidate;
 import com.ercanbeyen.candidateservice.client.AuthClient;
-import com.ercanbeyen.servicecommon.client.SchoolServiceClient;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
 import com.ercanbeyen.candidateservice.mapper.CandidateMapper;
@@ -23,12 +23,12 @@ import java.util.List;
 public class CandidateServiceImpl implements CandidateService {
     private final CandidateRepository candidateRepository;
     private final CandidateMapper candidateMapper;
-    private final SchoolServiceClient schoolServiceClient;
+    private final SchoolClient schoolClient;
     private final AuthClient authClient;
 
     @Override
     public CandidateDto createCandidate(CandidateDto request) {
-        checkSchool(request);
+        schoolClient.checkSchool(request);
 
         Candidate candidate = candidateMapper.dtoToEntity(request);
         candidate.setSchoolName(request.schoolName());
@@ -41,7 +41,7 @@ public class CandidateServiceImpl implements CandidateService {
         Candidate candidate = findById(id);
         authClient.checkLoggedInUser(candidate.getUsername(), username);
 
-        checkSchool(request);
+        schoolClient.checkSchool(request);
 
         candidate.setSchoolName(request.schoolName());
         candidate.setFullName(request.fullName());
@@ -98,11 +98,5 @@ public class CandidateServiceImpl implements CandidateService {
         log.info(LogMessage.RESOURCE_FOUND, "Candidate", id);
 
         return candidate;
-    }
-
-    private void checkSchool(CandidateDto request) {
-        ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(request.schoolName());
-        log.debug(LogMessage.CLIENT_SERVICE_RESPONSE, "School", schoolServiceResponse);
-        log.info(LogMessage.RESOURCE_FOUND, "School", request.schoolName());
     }
 }

@@ -1,5 +1,6 @@
 package com.ercanbeyen.authservice.service;
 
+import com.ercanbeyen.authservice.client.CandidateClient;
 import com.ercanbeyen.authservice.constant.enums.TokenStatus;
 import com.ercanbeyen.authservice.constant.message.JwtMessage;
 import com.ercanbeyen.authservice.dto.request.LoginRequest;
@@ -39,15 +40,15 @@ public class AuthService {
     private final UserTokenService userTokenService;
     private final UserCredentialService userCredentialService;
     private final AuthenticationManager authenticationManager;
-    private final RestTemplate restTemplate;
+    private final CandidateClient candidateClient;
 
-    //@Transactional
+    @Transactional
     public String register(RegistrationRequest request) {
-        userCredentialService.checkUserCredentialByUsername(request.username());
+        userCredentialService.checkUserCredentialByUsername(request.candidateDto().username());
         userCredentialService.createUserCredential(request);
 
         try {
-            createCandidate(request);
+            candidateClient.createCandidate(request);
         } catch (Exception exception) {
             log.error("AuthService::register exception caught: {}", exception.getMessage());
             throw new InternalServerErrorException("Candidate could not created");
@@ -149,12 +150,5 @@ public class AuthService {
             log.error("Exception: {}. Message: {}", exception.getClass(), exception.getMessage());
             throw exception;
         }
-    }
-
-    private void createCandidate(RegistrationRequest request) throws URISyntaxException {
-        URI uri = new URI("http://localhost:" + 8082 + "/candidates");
-
-        CandidateDto requestedCandidate = new CandidateDto(null, request.username(), request.fullName(), request.age(), request.gender(), request.schoolName());
-        restTemplate.postForObject(uri, requestedCandidate, CandidateDto.class);
     }
 }

@@ -3,6 +3,7 @@ package com.ercanbeyen.candidateservice.controller;
 import com.ercanbeyen.candidateservice.client.AuthClient;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
 import com.ercanbeyen.candidateservice.service.CandidateService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +20,12 @@ public class CandidateController {
     private final AuthClient authClient;
 
     @PostMapping
-    public ResponseEntity<CandidateDto> createCandidate(@RequestBody CandidateDto request) {
+    public ResponseEntity<CandidateDto> createCandidate(@RequestBody @Valid CandidateDto request) {
         return ResponseEntity.ok(candidateService.createCandidate(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CandidateDto> updateCandidate(@PathVariable String id, @RequestBody CandidateDto request, @RequestHeader("loggedInUser") String username) {
+    public ResponseEntity<CandidateDto> updateCandidate(@PathVariable String id, @RequestBody @Valid CandidateDto request, @RequestHeader("loggedInUser") String username) {
         return ResponseEntity.ok(candidateService.updateCandidate(id, request, username));
     }
 
