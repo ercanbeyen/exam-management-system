@@ -1,6 +1,9 @@
 package com.ercanbeyen.servicecommon.client.exception;
 
 public class GlobalErrorCode {
+    public static final String AUTH_CONFLICT_ERROR = "AUTH-SERVICE-1004";
+    public static final String AUTH_EXPECTATION_FAILED_ERROR = "AUTH-SERVICE-1005";
+
     public static final String EXAM_GENERIC_ERROR = "EXAM-SERVICE-1000";
     public static final String EXAM_BAD_REQUEST_ERROR = "EXAM-SERVICE-1001";
     public static final String EXAM_NOT_FOUND_ERROR = "EXAM-SERVICE-1002";

@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
@@ -54,10 +56,8 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                     assert checkRoleResponse != null;
 
                     if (!checkRoleResponse) {
-                        log.error("Unauthorized user");
-                        var response = exchange.getResponse();
-                        response.setStatusCode(HttpStatus.UNAUTHORIZED);
-                        return response.setComplete();
+                        log.error("Access denied for user");
+                        return constructResponse(exchange, HttpStatus.FORBIDDEN);
                     }
 
                     String username = restTemplate.getForObject(AUTH_URL + "/extract/username?token=" + authHeader, String.class);
@@ -67,7 +67,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                             .build();
                 } catch (Exception exception) {
                     log.error("AuthenticationFilter::apply exception caught: {}", exception.getMessage());
-                    throw exception;
+                    return constructResponse(exchange, HttpStatus.UNAUTHORIZED);
                 }
             }
 
@@ -84,5 +84,11 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     @Override
     public List<String> shortcutFieldOrder() {
         return List.of("role");
+    }
+
+    private static Mono<Void> constructResponse(ServerWebExchange exchange, HttpStatus status) {
+        var response = exchange.getResponse();
+        response.setStatusCode(status);
+        return response.setComplete();
     }
 }
