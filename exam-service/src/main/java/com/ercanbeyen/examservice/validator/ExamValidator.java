@@ -39,8 +39,8 @@ public class ExamValidator {
             throw new BadRequestException("Registration begin date must be before end time");
         }
 
-        if (!registrationPeriod.beginAt().isAfter(LocalDateTime.now())) {
-            throw new BadRequestException("Registration begin date must after than now");
+        if (!registrationPeriod.endAt().isAfter(LocalDateTime.now())) {
+            throw new BadRequestException("Registration end date must after than now");
         }
 
         log.info("Registration period is valid");

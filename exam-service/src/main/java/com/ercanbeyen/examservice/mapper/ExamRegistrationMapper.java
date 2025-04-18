@@ -24,6 +24,7 @@ public interface ExamRegistrationMapper {
                 examEvent.getId(),
                 examEvent.getExam().getSubject(),
                 examLocationDto,
+                examEvent.getProctors(),
                 examEvent.getExamRegistrations()
                         .stream()
                         .map(ExamRegistration::getId)

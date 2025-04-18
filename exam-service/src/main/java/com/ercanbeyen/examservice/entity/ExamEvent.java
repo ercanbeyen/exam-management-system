@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -18,6 +19,7 @@ public class ExamEvent {
     private Exam exam;
     @Embedded
     private ExamLocation location;
+    private Set<String> proctors;
     @OneToMany(mappedBy = "examEvent")
     private List<ExamRegistration> examRegistrations;
 

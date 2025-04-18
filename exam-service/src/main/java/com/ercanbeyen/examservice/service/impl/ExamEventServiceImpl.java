@@ -1,5 +1,6 @@
 package com.ercanbeyen.examservice.service.impl;
 
+import com.ercanbeyen.examservice.client.CandidateClient;
 import com.ercanbeyen.examservice.dto.ExamEventDto;
 import com.ercanbeyen.examservice.dto.ExamLocationDto;
 import com.ercanbeyen.examservice.embeddable.ExamLocation;
@@ -34,10 +35,13 @@ public class ExamEventServiceImpl implements ExamEventService {
     private final SchoolServiceClient schoolServiceClient;
     private final ExamService examService;
     private final ExamEventNotificationService examEventNotificationService;
+    private final CandidateClient candidateClient;
 
     @Override
     public ExamEventDto createExamEvent(ExamEventDto request, String username) {
+        checkProctors(request);
         checkExamEventConflicts(request);
+
         ExamEvent examEvent = constructExamEvent(null, request);
         ExamEvent savedExamEvent = examEventRepository.save(examEvent);
 
@@ -49,7 +53,9 @@ public class ExamEventServiceImpl implements ExamEventService {
 
     @Override
     public ExamEventDto updateExamEvent(String id, ExamEventDto request, String username) {
+        checkProctors(request);
         checkExamEventConflicts(request);
+
         ExamEvent examEvent = constructExamEvent(id, request);
         return examEventMapper.entityToDto(examEventRepository.save(examEvent));
     }
@@ -158,5 +164,12 @@ public class ExamEventServiceImpl implements ExamEventService {
         }
 
         log.info("There is no any conflicts between any exam events");
+    }
+
+    private void checkProctors(ExamEventDto request) {
+        request.proctors()
+                .forEach(candidateClient::checkCandidateByUsername);
+
+        log.info("Proctors exist");
     }
 }
