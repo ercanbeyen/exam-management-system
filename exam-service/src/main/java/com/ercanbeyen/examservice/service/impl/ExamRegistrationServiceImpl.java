@@ -48,11 +48,13 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         String candidateId = request.candidateId();
         candidateClient.checkCandidate(username, candidateId);
 
+        checkIsUserProctorInExam(username, exam);
+
         if (examRegistrationRepository.existsByExamEventAndCandidateId(examEvent, candidateId)) {
-            throw new ResourceConflictException("Candidate has already been registered to exam before");
+            throw new ResourceConflictException("Candidate has already been registered for exam before");
         }
 
-        log.info("Candidate {} has not registered to exam {} yet", candidateId, examEvent.getExam().getSubject());
+        log.info("Candidate {} has not registered for exam {} yet", candidateId, examEvent.getExam().getSubject());
 
         schoolClient.checkClassroomCapacityForExamRegistration(examEvent);
 
@@ -81,16 +83,16 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         ExamRegistrationValidator.checkExamRegistrationPeriod(exam);
 
         ExamEventDto examEventDto = request.examEventDto();
-        ExamEvent requestedExamEvent = examEventService.findExamEventBySubjectAndLocationAndPeriod(
+        ExamEvent examEvent = examEventService.findExamEventBySubjectAndLocationAndPeriod(
                 examEventDto.examSubject(), examEventDto.location(), exam.getExamPeriod());
 
         String candidateId = request.candidateId();
         candidateClient.checkCandidate(username, candidateId);
 
-        if (!requestedExamEvent.getId().equals(examRegistration.getExamEvent().getId())) {
+        if (!examEvent.getId().equals(examRegistration.getExamEvent().getId())) {
             log.info("Classroom of candidate may check. Classroom capacity must be checked before update");
-            schoolClient.checkClassroomCapacityForExamRegistration(requestedExamEvent);
-            examRegistration.setExamEvent(requestedExamEvent);
+            schoolClient.checkClassroomCapacityForExamRegistration(examEvent);
+            examRegistration.setExamEvent(examEvent);
         }
 
         examRegistration.setUpdatedAt(LocalDateTime.now());
@@ -133,5 +135,20 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         log.info(LogMessage.RESOURCE_FOUND, "Exam registration", id);
 
         return examRegistration;
+    }
+
+    private static void checkIsUserProctorInExam(String username, Exam exam) {
+        exam.getExamEvents()
+                .stream()
+                .map(ExamEvent::getProctors)
+                .forEach(proctors -> {
+                    for (String proctor : proctors) {
+                        if (proctor.equals(username)) {
+                            throw new ResourceConflictException("Proctors cannot register for the the exam");
+                        }
+                    }
+                });
+
+        log.info("User {} is not one of the proctors in the exam {}", username, exam.getSubject());
     }
 }
