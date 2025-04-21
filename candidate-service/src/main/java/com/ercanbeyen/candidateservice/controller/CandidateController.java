@@ -3,6 +3,7 @@ package com.ercanbeyen.candidateservice.controller;
 import com.ercanbeyen.candidateservice.client.AuthClient;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
 import com.ercanbeyen.candidateservice.service.CandidateService;
+import com.ercanbeyen.servicecommon.client.logging.LogMessage;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,13 +32,13 @@ public class CandidateController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CandidateDto> getCandidate(@PathVariable String id, @RequestHeader("loggedInUser") String username) {
-        log.info("loggedInUsername: {}", username);
+        log.info(LogMessage.LOGGED_IN_USER, username);
         return ResponseEntity.ok(candidateService.getCandidate(id, username));
     }
 
     @GetMapping("/users/{username}")
     public ResponseEntity<CandidateDto> getCandidateByUsername(@PathVariable("username") String username, @RequestHeader("loggedInUser") String loggedInUsername) {
-        log.info("loggedInUsername: {}", loggedInUsername);
+        log.info(LogMessage.LOGGED_IN_USER, loggedInUsername);
         return ResponseEntity.ok(candidateService.getCandidateByUsername(username, loggedInUsername));
     }
 

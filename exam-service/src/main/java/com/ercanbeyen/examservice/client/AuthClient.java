@@ -13,17 +13,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthClient {
+    public static final String ROLE_ADMIN = "ADMIN";
     private final AuthServiceClient authServiceClient;
 
     public void checkUserHasAdminRole(String username) {
-        ResponseEntity<Boolean> response = authServiceClient.checkUserRole(username, "ADMIN");
-        Boolean body = response.getBody();
-
-        assert Optional.ofNullable(body).isPresent();
-        boolean isAdmin = body;
-
-        if (!isAdmin) {
-            log.error("Only admins may observe all candidates");
+        if (!userHasAdminRole(username)) {
+            log.error("User does not have {} role", ROLE_ADMIN);
             throw new ResourceForbiddenException(String.format("User %s is not authorized", username));
         }
 
@@ -37,5 +32,13 @@ public class AuthClient {
         }
 
         log.info("Notification belongs to user {}", loggedInUsername);
+    }
+
+    private boolean userHasAdminRole(String username) {
+        ResponseEntity<Boolean> response = authServiceClient.checkUserRole(username, ROLE_ADMIN);
+        Boolean body = response.getBody();
+
+        assert Optional.ofNullable(body).isPresent();
+        return body;
     }
 }

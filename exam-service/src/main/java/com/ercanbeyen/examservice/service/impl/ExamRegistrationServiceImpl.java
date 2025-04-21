@@ -1,9 +1,15 @@
 package com.ercanbeyen.examservice.service.impl;
 
+import com.ercanbeyen.examservice.client.AuthClient;
 import com.ercanbeyen.examservice.client.CandidateClient;
 import com.ercanbeyen.examservice.client.SchoolClient;
 import com.ercanbeyen.examservice.dto.ExamEventDto;
+import com.ercanbeyen.examservice.dto.ExamLocationDto;
+import com.ercanbeyen.examservice.dto.ExamPeriodDto;
 import com.ercanbeyen.examservice.dto.ExamRegistrationDto;
+import com.ercanbeyen.examservice.dto.response.ExamEntry;
+import com.ercanbeyen.examservice.embeddable.ExamLocation;
+import com.ercanbeyen.examservice.embeddable.ExamPeriod;
 import com.ercanbeyen.examservice.entity.Exam;
 import com.ercanbeyen.examservice.entity.ExamEvent;
 import com.ercanbeyen.examservice.entity.ExamRegistration;
@@ -22,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,6 +42,7 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     private final ExamRegistrationNotificationService examRegistrationNotificationService;
     private final CandidateClient candidateClient;
     private final SchoolClient schoolClient;
+    private final AuthClient authClient;
 
     @Override
     public ExamRegistrationDto createExamRegistration(ExamRegistrationDto request, String username) {
@@ -116,6 +124,40 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
                 .stream()
                 .map(examRegistrationMapper::entityToDto)
                 .toList();
+    }
+
+    @Override
+    public List<ExamEntry> getExamEntries(String examEventId, String username) {
+        ExamEvent examEvent = examEventService.findById(examEventId);
+
+        boolean userIsProctor = examEvent.getProctors()
+                .stream()
+                .anyMatch(proctor -> proctor.equals(username));
+
+        /* Only admins or proctors may observe the exam entries */
+        if (!userIsProctor) {
+            log.warn("User {} is not proctor in the exam {}", username, examEvent.getExam().getSubject());
+            authClient.checkUserHasAdminRole(username);
+        } else {
+            log.info("User {} is proctor in the exam {}", username, examEvent.getExam().getSubject());
+        }
+
+        List<ExamEntry> examEntries = new ArrayList<>();
+
+        examRegistrationRepository.findAllByExamEvent(examEvent)
+                .forEach(examRegistration -> {
+                    Exam exam = examEvent.getExam();
+                    ExamPeriod examPeriod = exam.getExamPeriod();
+                    ExamLocation eventLocation = examEvent.getLocation();
+
+                    ExamPeriodDto examPeriodDto = new ExamPeriodDto(examPeriod.getDate(), examPeriod.getStartTime(), examPeriod.getFinishTime());
+                    ExamLocationDto examLocationDto = new ExamLocationDto(eventLocation.getSchoolName(), eventLocation.getClassroomName());
+                    ExamEntry examEntry = new ExamEntry(examRegistration.getCandidateId(), exam.getSubject(), examLocationDto, examPeriodDto);
+
+                    examEntries.add(examEntry);
+                });
+
+        return examEntries;
     }
 
     @Override

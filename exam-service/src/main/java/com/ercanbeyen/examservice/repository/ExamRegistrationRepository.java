@@ -11,4 +11,5 @@ import java.util.List;
 public interface ExamRegistrationRepository extends JpaRepository<ExamRegistration, String> {
     List<ExamRegistration> findAllByCandidateId(String candidateId);
     boolean existsByExamEventAndCandidateId(ExamEvent examEvent, String candidateId);
+    List<ExamRegistration> findAllByExamEvent(ExamEvent examEvent);
 }
