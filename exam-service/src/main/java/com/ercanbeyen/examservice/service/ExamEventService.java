@@ -1,7 +1,7 @@
 package com.ercanbeyen.examservice.service;
 
 import com.ercanbeyen.examservice.dto.ExamEventDto;
-import com.ercanbeyen.examservice.dto.ExamLocationDto;
+import com.ercanbeyen.examservice.embeddable.ExamLocation;
 import com.ercanbeyen.examservice.embeddable.ExamPeriod;
 import com.ercanbeyen.examservice.entity.ExamEvent;
 
@@ -14,5 +14,5 @@ public interface ExamEventService {
     List<ExamEventDto> getExamEvents(String username);
     String deleteExamEvent(String id, String username);
     ExamEvent findById(String id);
-    ExamEvent findExamEventBySubjectAndLocationAndPeriod(String examSubject, ExamLocationDto examLocation, ExamPeriod examPeriod);
+    ExamEvent findExamEventBySubjectAndLocationAndPeriod(String examSubject, ExamLocation examLocation, ExamPeriod examPeriod);
 }

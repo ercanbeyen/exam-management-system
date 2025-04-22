@@ -4,12 +4,8 @@ import com.ercanbeyen.examservice.client.AuthClient;
 import com.ercanbeyen.examservice.client.CandidateClient;
 import com.ercanbeyen.examservice.client.SchoolClient;
 import com.ercanbeyen.examservice.dto.ExamEventDto;
-import com.ercanbeyen.examservice.dto.ExamLocationDto;
-import com.ercanbeyen.examservice.dto.ExamPeriodDto;
 import com.ercanbeyen.examservice.dto.ExamRegistrationDto;
 import com.ercanbeyen.examservice.dto.response.ExamEntry;
-import com.ercanbeyen.examservice.embeddable.ExamLocation;
-import com.ercanbeyen.examservice.embeddable.ExamPeriod;
 import com.ercanbeyen.examservice.entity.Exam;
 import com.ercanbeyen.examservice.entity.ExamEvent;
 import com.ercanbeyen.examservice.entity.ExamRegistration;
@@ -147,12 +143,8 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         examRegistrationRepository.findAllByExamEvent(examEvent)
                 .forEach(examRegistration -> {
                     Exam exam = examEvent.getExam();
-                    ExamPeriod examPeriod = exam.getExamPeriod();
-                    ExamLocation eventLocation = examEvent.getLocation();
 
-                    ExamPeriodDto examPeriodDto = new ExamPeriodDto(examPeriod.getDate(), examPeriod.getStartTime(), examPeriod.getFinishTime());
-                    ExamLocationDto examLocationDto = new ExamLocationDto(eventLocation.getSchoolName(), eventLocation.getClassroomName());
-                    ExamEntry examEntry = new ExamEntry(examRegistration.getCandidateId(), exam.getSubject(), examLocationDto, examPeriodDto);
+                    ExamEntry examEntry = new ExamEntry(examRegistration.getCandidateId(), exam.getSubject(), examEvent.getLocation(), exam.getExamPeriod());
 
                     examEntries.add(examEntry);
                 });

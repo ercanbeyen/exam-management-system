@@ -1,9 +1,7 @@
 package com.ercanbeyen.examservice.mapper;
 
 import com.ercanbeyen.examservice.dto.ExamEventDto;
-import com.ercanbeyen.examservice.dto.ExamLocationDto;
 import com.ercanbeyen.examservice.dto.ExamRegistrationDto;
-import com.ercanbeyen.examservice.embeddable.ExamLocation;
 import com.ercanbeyen.examservice.entity.ExamEvent;
 import com.ercanbeyen.examservice.entity.ExamRegistration;
 import org.mapstruct.Mapper;
@@ -18,12 +16,10 @@ public interface ExamRegistrationMapper {
 
     @Named("convertExamEventToDto")
     static ExamEventDto convertExamEventToDto(ExamEvent examEvent) {
-        ExamLocation examLocation = examEvent.getLocation();
-        ExamLocationDto examLocationDto = new ExamLocationDto(examLocation.getSchoolName(), examLocation.getClassroomName());
         return new ExamEventDto(
                 examEvent.getId(),
                 examEvent.getExam().getSubject(),
-                examLocationDto,
+                examEvent.getLocation(),
                 examEvent.getProctors(),
                 examEvent.getExamRegistrations()
                         .stream()
