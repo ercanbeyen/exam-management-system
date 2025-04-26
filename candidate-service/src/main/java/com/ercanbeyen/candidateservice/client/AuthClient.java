@@ -1,6 +1,7 @@
 package com.ercanbeyen.candidateservice.client;
 
 import com.ercanbeyen.servicecommon.client.AuthServiceClient;
+import com.ercanbeyen.servicecommon.client.auth.Role;
 import com.ercanbeyen.servicecommon.client.exception.ResourceForbiddenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,18 +17,19 @@ public class AuthClient {
     private final AuthServiceClient authServiceClient;
 
     public void checkUserHasAdminRole(String username) {
-        ResponseEntity<Boolean> response = authServiceClient.checkUserRole(username, "ADMIN");
+        Role role = Role.ADMIN;
+        ResponseEntity<Boolean> response = authServiceClient.checkUserRole(username, role.toString());
         Boolean body = response.getBody();
 
         assert Optional.ofNullable(body).isPresent();
         boolean isAdmin = body;
 
         if (!isAdmin) {
-            log.error("Only admins may observe all candidates");
+            log.error("Only {}s may observe all candidates", role.getValue());
             throw new ResourceForbiddenException(String.format("Username %s is not authorized", username));
         }
 
-        log.info("User {} has admin role", username);
+        log.info("User {} has {} role", username, role.getValue());
     }
 
     public void checkLoggedInUser(String candidateUsername, String loggedInUsername) {

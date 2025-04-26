@@ -1,6 +1,7 @@
 package com.ercanbeyen.examservice.client;
 
 import com.ercanbeyen.servicecommon.client.AuthServiceClient;
+import com.ercanbeyen.servicecommon.client.auth.Role;
 import com.ercanbeyen.servicecommon.client.exception.ResourceForbiddenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,16 +14,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthClient {
-    public static final String ROLE_ADMIN = "ADMIN";
     private final AuthServiceClient authServiceClient;
 
     public void checkUserHasAdminRole(String username) {
+        String role = Role.ADMIN.getValue();
+
         if (!userHasAdminRole(username)) {
-            log.error("User does not have {} role", ROLE_ADMIN);
+            log.error("User does not have {} role", role);
             throw new ResourceForbiddenException(String.format("User %s is not authorized", username));
         }
 
-        log.info("User {} has admin role", username);
+        log.info("User {} has {} role", username, role);
     }
 
     public void checkLoggedInUser(String candidateUsername, String loggedInUsername) {
@@ -35,7 +37,7 @@ public class AuthClient {
     }
 
     private boolean userHasAdminRole(String username) {
-        ResponseEntity<Boolean> response = authServiceClient.checkUserRole(username, ROLE_ADMIN);
+        ResponseEntity<Boolean> response = authServiceClient.checkUserRole(username, Role.ADMIN.toString());
         Boolean body = response.getBody();
 
         assert Optional.ofNullable(body).isPresent();

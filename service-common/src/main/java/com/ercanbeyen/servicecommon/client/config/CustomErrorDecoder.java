@@ -1,16 +1,17 @@
 package com.ercanbeyen.servicecommon.client.config;
 
 import com.ercanbeyen.servicecommon.client.exception.*;
+import com.ercanbeyen.servicecommon.client.exception.response.ErrorResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
 import feign.codec.ErrorDecoder;
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class CustomErrorDecoder implements ErrorDecoder {
     private static final Logger log = LoggerFactory.getLogger(CustomErrorDecoder.class);
@@ -21,7 +22,7 @@ public class CustomErrorDecoder implements ErrorDecoder {
         String message;
 
         try (response) {
-            String json = IOUtils.toString(responseBody.asInputStream(), Charsets.UTF_8);
+            String json = IOUtils.toString(responseBody.asInputStream(), StandardCharsets.UTF_8);
             ErrorResponse errorResponse = new ObjectMapper().readValue(json, ErrorResponse.class);
             message = errorResponse.message();
             log.info("Exception is successfully processed");

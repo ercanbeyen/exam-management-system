@@ -1,4 +1,4 @@
-package com.ercanbeyen.servicecommon.client.exception;
+package com.ercanbeyen.servicecommon.client.exception.response;
 
 import org.springframework.http.HttpStatus;
 
