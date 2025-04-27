@@ -1,4 +1,4 @@
-package com.ercanbeyen.servicecommon.client.exception;
+package com.ercanbeyen.servicecommon.client.exception.constant;
 
 public class GlobalErrorCode {
     public static final String AUTH_CONFLICT_ERROR = "AUTH-SERVICE-1004";

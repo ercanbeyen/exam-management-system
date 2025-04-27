@@ -12,9 +12,9 @@ public class SchoolValidator {
     public void checkClassrooms(SchoolDto request) {
         Set<String> names = new HashSet<>();
 
-        request.classroomDtos()
+        request.classrooms()
                 .forEach(classroom -> {
-                    String name = classroom.name();
+                    String name = classroom.getName();
 
                     if (names.contains(name)) {
                         throw new ResourceConflictException("Classroom names must be unique");

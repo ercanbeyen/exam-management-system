@@ -1,6 +1,7 @@
 package com.ercanbeyen.examservice.controller;
 
 import com.ercanbeyen.examservice.dto.ExamRegistrationDto;
+import com.ercanbeyen.examservice.dto.response.ExamEntry;
 import com.ercanbeyen.examservice.service.ExamRegistrationService;
 import com.ercanbeyen.examservice.client.AuthClient;
 import jakarta.validation.Valid;
@@ -36,6 +37,11 @@ public class ExamRegistrationController {
     public ResponseEntity<List<ExamRegistrationDto>> getExamRegistrations(@RequestParam("user") String candidateUsername, @RequestHeader("loggedInUser") String loggedInUsername) {
         authClient.checkLoggedInUser(candidateUsername, loggedInUsername);
         return ResponseEntity.ok(examRegistrationService.getExamRegistrations(candidateUsername));
+    }
+
+    @GetMapping("/candidates")
+    public ResponseEntity<List<ExamEntry>> getExamEntries(@RequestParam("exam-event") String examEventId, @RequestHeader("loggedInUser") String loggedInUsername) {
+        return ResponseEntity.ok(examRegistrationService.getExamEntries(examEventId, loggedInUsername));
     }
 
     @DeleteMapping("/{id}")

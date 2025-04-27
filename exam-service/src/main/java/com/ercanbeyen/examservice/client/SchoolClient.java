@@ -3,9 +3,10 @@ package com.ercanbeyen.examservice.client;
 import com.ercanbeyen.examservice.embeddable.ExamLocation;
 import com.ercanbeyen.examservice.entity.ExamEvent;
 import com.ercanbeyen.servicecommon.client.SchoolServiceClient;
-import com.ercanbeyen.servicecommon.client.contract.ClassroomDto;
+import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.servicecommon.client.exception.InternalServerErrorException;
 import com.ercanbeyen.servicecommon.client.exception.ResourceConflictException;
+import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +20,19 @@ public class SchoolClient {
 
     public void checkClassroomCapacityForExamRegistration(ExamEvent examEvent) {
         ExamLocation examLocation = examEvent.getLocation();
-        String classroomName = examLocation.getClassroomName();
-        ResponseEntity<ClassroomDto> schoolServiceResponse = schoolServiceClient.getClassroom(examLocation.getSchoolName(), classroomName);
+        ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(examLocation.getSchool());
+
+        String classroomName = examEvent.getLocation().getClassroom();
 
         assert schoolServiceResponse.getBody() != null;
-        ClassroomDto classroomDto = schoolServiceResponse.getBody();
+        int classroomCapacity = schoolServiceResponse.getBody()
+                .classrooms()
+                .stream()
+                .filter(classroomInSchool -> classroomInSchool.getName().equals(classroomName))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Classroom " + classroomName + " is not found in school " + examEvent.getLocation().getSchool()))
+                .getCapacity();
 
-        int classroomCapacity = classroomDto.capacity();
         int numberOfRegistrations = examEvent.getExamRegistrations().size();
 
         log.info("Classroom capacity and number of registrations: {} & {}", classroomCapacity, numberOfRegistrations);

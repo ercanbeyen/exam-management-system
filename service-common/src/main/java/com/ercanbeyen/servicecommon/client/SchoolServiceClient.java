@@ -1,7 +1,6 @@
 package com.ercanbeyen.servicecommon.client;
 
 import com.ercanbeyen.servicecommon.client.config.FeignConfig;
-import com.ercanbeyen.servicecommon.client.contract.ClassroomDto;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +11,4 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface SchoolServiceClient {
     @GetMapping("/schools/{name}")
     ResponseEntity<SchoolDto> getSchool(@PathVariable String name);
-    @GetMapping("/schools/{name}/classrooms/{classroom}")
-    ResponseEntity<ClassroomDto> getClassroom(@PathVariable String name, @PathVariable("classroom") String classroomName);
 }

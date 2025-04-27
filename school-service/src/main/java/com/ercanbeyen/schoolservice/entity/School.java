@@ -1,6 +1,6 @@
 package com.ercanbeyen.schoolservice.entity;
 
-import com.ercanbeyen.schoolservice.embeddable.Classroom;
+import com.ercanbeyen.servicecommon.client.contract.embeddable.Classroom;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

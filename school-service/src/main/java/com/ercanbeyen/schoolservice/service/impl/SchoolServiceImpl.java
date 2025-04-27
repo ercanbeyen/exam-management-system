@@ -1,8 +1,5 @@
 package com.ercanbeyen.schoolservice.service.impl;
 
-import com.ercanbeyen.schoolservice.embeddable.Classroom;
-import com.ercanbeyen.schoolservice.mapper.ClassroomMapper;
-import com.ercanbeyen.servicecommon.client.contract.ClassroomDto;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.schoolservice.entity.School;
 import com.ercanbeyen.schoolservice.mapper.SchoolMapper;
@@ -23,7 +20,6 @@ import java.util.*;
 public class SchoolServiceImpl implements SchoolService {
     private final SchoolRepository schoolRepository;
     private final SchoolMapper schoolMapper;
-    private final ClassroomMapper classroomMapper;
 
     @Override
     public SchoolDto createSchool(SchoolDto request) {
@@ -43,12 +39,7 @@ public class SchoolServiceImpl implements SchoolService {
         school.setName(request.name());
         school.setLocation(request.location());
         school.setOwner(request.owner());
-        Set<Classroom> classrooms = new HashSet<>();
-
-        request.classroomDtos()
-                        .forEach(classroomDto -> classrooms.add(classroomMapper.dtoToEntity(classroomDto)));
-
-        school.setClassrooms(classrooms);
+        school.setClassrooms(request.classrooms());
 
         return schoolMapper.entityToDto(schoolRepository.save(school));
     }
@@ -56,18 +47,6 @@ public class SchoolServiceImpl implements SchoolService {
     @Override
     public SchoolDto getSchool(String name) {
         return schoolMapper.entityToDto(findByName(name));
-    }
-
-    @Override
-    public ClassroomDto getClassroom(String name, String classroomName) {
-        Classroom classroom = findByName(name)
-                .getClassrooms()
-                .stream()
-                .filter(classroomInSchool -> classroomInSchool.getName().equals(classroomName))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Classroom " + classroomName + " is not found in school " + name));
-
-        return classroomMapper.entityToDto(classroom);
     }
 
     @Override

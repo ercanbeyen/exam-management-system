@@ -1,9 +1,10 @@
 package com.ercanbeyen.servicecommon.client.contract;
 
+import com.ercanbeyen.servicecommon.client.contract.embeddable.Classroom;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
-import java.util.List;
+import java.util.Set;
 
 public record SchoolDto(
         String id,
@@ -13,6 +14,6 @@ public record SchoolDto(
         String location,
         @NotBlank(message = "Owner is mandatory")
         String owner,
-        List<@Valid ClassroomDto> classroomDtos) {
+        Set<@Valid Classroom> classrooms) {
 
 }

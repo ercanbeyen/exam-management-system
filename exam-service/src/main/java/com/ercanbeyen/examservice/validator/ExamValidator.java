@@ -1,8 +1,8 @@
 package com.ercanbeyen.examservice.validator;
 
 import com.ercanbeyen.examservice.dto.ExamDto;
-import com.ercanbeyen.examservice.dto.ExamPeriodDto;
-import com.ercanbeyen.examservice.dto.RegistrationPeriodDto;
+import com.ercanbeyen.examservice.embeddable.ExamPeriod;
+import com.ercanbeyen.examservice.embeddable.RegistrationPeriod;
 import com.ercanbeyen.servicecommon.client.exception.BadRequestException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -18,14 +18,14 @@ public class ExamValidator {
     }
 
     private void checkExamPeriod(ExamDto request) {
-        ExamPeriodDto examPeriod = request.examPeriod();
-        RegistrationPeriodDto registrationPeriod = request.registrationPeriod();
+        ExamPeriod examPeriod = request.period();
+        RegistrationPeriod registrationPeriod = request.registrationPeriod();
 
-        if (!examPeriod.startTime().isBefore(examPeriod.finishTime())) {
+        if (!examPeriod.getStartTime().isBefore(examPeriod.getFinishTime())) {
             throw new BadRequestException("Exam start time must be before finish time");
         }
 
-        if (!examPeriod.date().isAfter(registrationPeriod.endAt().toLocalDate())) {
+        if (!examPeriod.getDate().isAfter(registrationPeriod.getEndAt().toLocalDate())) {
             throw new BadRequestException("Exam date must be after than registration end date");
         }
 
@@ -33,14 +33,14 @@ public class ExamValidator {
     }
 
     private void checkRegistrationPeriod(ExamDto request) {
-        RegistrationPeriodDto registrationPeriod = request.registrationPeriod();
+        RegistrationPeriod registrationPeriod = request.registrationPeriod();
 
-        if (!registrationPeriod.beginAt().isBefore(registrationPeriod.endAt())) {
+        if (!registrationPeriod.getBeginAt().isBefore(registrationPeriod.getEndAt())) {
             throw new BadRequestException("Registration begin date must be before end time");
         }
 
-        if (!registrationPeriod.beginAt().isAfter(LocalDateTime.now())) {
-            throw new BadRequestException("Registration begin date must after than now");
+        if (!registrationPeriod.getEndAt().isAfter(LocalDateTime.now())) {
+            throw new BadRequestException("Registration end date must after than now");
         }
 
         log.info("Registration period is valid");

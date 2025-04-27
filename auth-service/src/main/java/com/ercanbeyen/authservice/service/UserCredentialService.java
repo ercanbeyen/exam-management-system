@@ -1,6 +1,6 @@
 package com.ercanbeyen.authservice.service;
 
-import com.ercanbeyen.authservice.constant.enums.Role;
+import com.ercanbeyen.servicecommon.client.auth.Role;
 import com.ercanbeyen.authservice.dto.request.RegistrationRequest;
 import com.ercanbeyen.authservice.entity.UserCredential;
 import com.ercanbeyen.authservice.exception.UserAlreadyExistException;

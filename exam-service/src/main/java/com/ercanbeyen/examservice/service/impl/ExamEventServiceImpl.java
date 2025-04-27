@@ -1,7 +1,7 @@
 package com.ercanbeyen.examservice.service.impl;
 
+import com.ercanbeyen.examservice.client.CandidateClient;
 import com.ercanbeyen.examservice.dto.ExamEventDto;
-import com.ercanbeyen.examservice.dto.ExamLocationDto;
 import com.ercanbeyen.examservice.embeddable.ExamLocation;
 import com.ercanbeyen.examservice.embeddable.ExamPeriod;
 import com.ercanbeyen.examservice.entity.Exam;
@@ -34,10 +34,13 @@ public class ExamEventServiceImpl implements ExamEventService {
     private final SchoolServiceClient schoolServiceClient;
     private final ExamService examService;
     private final ExamEventNotificationService examEventNotificationService;
+    private final CandidateClient candidateClient;
 
     @Override
     public ExamEventDto createExamEvent(ExamEventDto request, String username) {
+        checkProctors(request);
         checkExamEventConflicts(request);
+
         ExamEvent examEvent = constructExamEvent(null, request);
         ExamEvent savedExamEvent = examEventRepository.save(examEvent);
 
@@ -49,7 +52,9 @@ public class ExamEventServiceImpl implements ExamEventService {
 
     @Override
     public ExamEventDto updateExamEvent(String id, ExamEventDto request, String username) {
+        checkProctors(request);
         checkExamEventConflicts(request);
+
         ExamEvent examEvent = constructExamEvent(id, request);
         return examEventMapper.entityToDto(examEventRepository.save(examEvent));
     }
@@ -85,8 +90,8 @@ public class ExamEventServiceImpl implements ExamEventService {
     }
 
     @Override
-    public ExamEvent findExamEventBySubjectAndLocationAndPeriod(String examSubject, ExamLocationDto examLocation, ExamPeriod examPeriod) {
-        ExamLocation requestedExamLocation = new ExamLocation(examLocation.schoolName(), examLocation.classroomName());
+    public ExamEvent findExamEventBySubjectAndLocationAndPeriod(String examSubject, ExamLocation examLocation, ExamPeriod examPeriod) {
+        ExamLocation requestedExamLocation = new ExamLocation(examLocation.getSchool(), examLocation.getClassroom());
         return examEventRepository.findByExamSubjectAndExamLocationAndExamPeriod(examSubject, requestedExamLocation, examPeriod.getDate())
                 .orElseThrow(() -> new ResourceNotFoundException("Exam event not found for exam " + examSubject + " on " + examLocation + " at " +  examPeriod));
     }
@@ -97,36 +102,32 @@ public class ExamEventServiceImpl implements ExamEventService {
                 : examEventMapper.dtoToEntity(request);
 
         Exam exam = examService.findBySubject(request.examSubject());
-        ExamLocationDto requestedLocation = request.location();
+        ExamLocation requestedLocation = request.location();
 
-        ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(requestedLocation.schoolName());
+        ResponseEntity<SchoolDto> schoolServiceResponse = schoolServiceClient.getSchool(requestedLocation.getSchool());
         SchoolDto schoolDto = schoolServiceResponse.getBody();
 
         assert schoolDto != null;
 
-        boolean classroomIdExists = schoolDto.classroomDtos()
+        boolean classroomIdExists = schoolDto.classrooms()
                 .stream()
-                .anyMatch(classroomDto -> classroomDto.name().equals(requestedLocation.classroomName()));
+                .anyMatch(classroomDto -> classroomDto.getName().equals(requestedLocation.getClassroom()));
 
         if (!classroomIdExists) {
-            throw new ResourceNotFoundException(String.format("Classroom %s does not found inside school %s", requestedLocation.classroomName(), requestedLocation.schoolName()));
+            throw new ResourceNotFoundException(String.format("Classroom %s does not found inside school %s", requestedLocation.getClassroom(), requestedLocation.getSchool()));
         }
 
-        ExamLocation examLocation = new ExamLocation(requestedLocation.schoolName(), requestedLocation.classroomName());
-
         examEvent.setExam(exam);
-        examEvent.setLocation(examLocation);
+        examEvent.setLocation(requestedLocation);
 
         return examEvent;
     }
     
     private void checkExamEventConflicts(ExamEventDto request) {
         Exam exam = examService.findBySubject(request.examSubject());
-        ExamLocationDto examLocationDto = request.location();
-        ExamLocation examLocation = new ExamLocation(examLocationDto.schoolName(), examLocationDto.classroomName());
         ExamPeriod requestedExamPeriod = exam.getExamPeriod();
 
-        List<ExamEvent> examEvents = examEventRepository.findAllByExamLocationAndExamPeriod(examLocation, exam.getExamPeriod().getDate())
+        List<ExamEvent> examEvents = examEventRepository.findAllByExamLocationAndExamPeriod(request.location(), exam.getExamPeriod().getDate())
                 .stream()
                 .filter(examEvent -> {
                     ExamPeriod examPeriod = examEvent.getExam().getExamPeriod();
@@ -158,5 +159,12 @@ public class ExamEventServiceImpl implements ExamEventService {
         }
 
         log.info("There is no any conflicts between any exam events");
+    }
+
+    private void checkProctors(ExamEventDto request) {
+        request.proctors()
+                .forEach(candidateClient::checkCandidateByUsername);
+
+        log.info("Proctors exist");
     }
 }

@@ -1,5 +1,7 @@
 package com.ercanbeyen.examservice.dto;
 
+import com.ercanbeyen.examservice.embeddable.ExamPeriod;
+import com.ercanbeyen.examservice.embeddable.RegistrationPeriod;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
@@ -10,9 +12,9 @@ public record ExamDto(
         @NotBlank(message = "Subject is mandatory")
         String subject,
         @Valid
-        RegistrationPeriodDto registrationPeriod,
+        RegistrationPeriod registrationPeriod,
         @Valid
-        ExamPeriodDto examPeriod,
+        ExamPeriod period,
         List<String> examEventIds) {
 
 }

@@ -1,7 +1,6 @@
 package com.ercanbeyen.schoolservice.controller;
 
 import com.ercanbeyen.schoolservice.validator.SchoolValidator;
-import com.ercanbeyen.servicecommon.client.contract.ClassroomDto;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.schoolservice.service.SchoolService;
 import jakarta.validation.Valid;
@@ -36,13 +35,6 @@ public class SchoolController {
         SchoolDto school = schoolService.getSchool(name);
         log.info("School is successfully fetched");
         return ResponseEntity.ok(school);
-    }
-
-    @GetMapping("/{name}/classrooms/{classroom}")
-    public ResponseEntity<ClassroomDto> getClassroom(@PathVariable String name, @PathVariable("classroom") String classroomName) {
-        ClassroomDto classroom = schoolService.getClassroom(name, classroomName);
-        log.info("Classroom is successfully fetched");
-        return ResponseEntity.ok(classroom);
     }
 
     @GetMapping

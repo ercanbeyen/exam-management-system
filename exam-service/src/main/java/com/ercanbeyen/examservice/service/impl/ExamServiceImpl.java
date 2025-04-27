@@ -1,6 +1,5 @@
 package com.ercanbeyen.examservice.service.impl;
 
-import com.ercanbeyen.examservice.embeddable.ExamPeriod;
 import com.ercanbeyen.examservice.mapper.ExamMapper;
 import com.ercanbeyen.examservice.dto.ExamDto;
 import com.ercanbeyen.examservice.repository.ExamRepository;
@@ -30,10 +29,9 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public ExamDto updateExam(String id, ExamDto request) {
         Exam exam = findById(id);
-        ExamPeriod examPeriod = new ExamPeriod(request.examPeriod().date(), request.examPeriod().startTime(), request.examPeriod().finishTime());
 
         exam.setSubject(request.subject());
-        exam.setExamPeriod(examPeriod);
+        exam.setExamPeriod(request.period());
 
         return examMapper.entityToDto(examRepository.save(exam));
     }
