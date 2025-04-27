@@ -63,10 +63,10 @@ Then you should run the following applications in order
 6) Auth Service
 7) School Service
 8) Candidate Service
-9) Exam Service
-10) Notification Service
+9) Notification Service
+10) Exam Service
 
 ### Monitor
 ---
 - Use Admin Server to monitor health of services.
-- Use Zipkin Server to trace the endpoints.
+- Use Zipkin Server to trace requests.
