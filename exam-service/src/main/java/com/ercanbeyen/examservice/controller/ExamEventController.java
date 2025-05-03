@@ -3,6 +3,8 @@ package com.ercanbeyen.examservice.controller;
 import com.ercanbeyen.examservice.dto.ExamEventDto;
 import com.ercanbeyen.examservice.service.ExamEventService;
 import com.ercanbeyen.examservice.client.AuthClient;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,13 +12,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/exam-events")
+@RequiredArgsConstructor
+@SecurityRequirement(name = "Authorization")
 public class ExamEventController {
     private final ExamEventService examEventService;
     private final AuthClient authClient;
 
+    @Operation(security = {@SecurityRequirement(name = "bearer")})
     @PostMapping
     public ResponseEntity<ExamEventDto> createExamEvent(@RequestBody @Valid ExamEventDto request, @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);

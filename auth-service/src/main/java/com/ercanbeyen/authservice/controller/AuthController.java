@@ -5,6 +5,7 @@ import com.ercanbeyen.authservice.dto.request.RegistrationRequest;
 import com.ercanbeyen.authservice.dto.response.MessageResponse;
 import com.ercanbeyen.authservice.entity.UserCredential;
 import com.ercanbeyen.authservice.service.AuthService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Slf4j
+@SecurityRequirement(name = "Authorization")
 public class AuthController {
     private final AuthService authService;
 

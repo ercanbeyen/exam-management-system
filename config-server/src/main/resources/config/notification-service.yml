@@ -39,6 +39,12 @@ spring:
         brokers:
           - localhost:9092
 
+springdoc:
+  api-docs:
+    path: /NOTIFICATION-SERVICE/v3/api-docs
+  swagger-ui:
+    path: /NOTIFICATION-SERVICE/swagger-ui.html
+
 eureka:
   client:
     register-with-eureka: true

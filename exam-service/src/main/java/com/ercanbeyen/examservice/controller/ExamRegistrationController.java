@@ -4,6 +4,7 @@ import com.ercanbeyen.examservice.dto.ExamRegistrationDto;
 import com.ercanbeyen.examservice.dto.response.ExamEntry;
 import com.ercanbeyen.examservice.service.ExamRegistrationService;
 import com.ercanbeyen.examservice.client.AuthClient;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/exam-registrations")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Authorization")
 public class ExamRegistrationController {
     private final ExamRegistrationService examRegistrationService;
     private final AuthClient authClient;

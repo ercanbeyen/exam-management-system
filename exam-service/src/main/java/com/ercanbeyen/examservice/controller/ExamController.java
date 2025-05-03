@@ -4,6 +4,7 @@ import com.ercanbeyen.examservice.dto.ExamDto;
 import com.ercanbeyen.examservice.service.ExamService;
 import com.ercanbeyen.examservice.client.AuthClient;
 import com.ercanbeyen.examservice.validator.ExamValidator;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/exams")
+@RequiredArgsConstructor
+@SecurityRequirement(name = "Authorization")
 public class ExamController {
     private final ExamService examService;
     private final AuthClient authClient;

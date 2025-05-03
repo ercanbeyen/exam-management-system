@@ -1,17 +1,19 @@
-package com.ercanbeyen.notificationservice.config;
+package com.ercanbeyen.notificationservice.controller;
 
 import com.ercanbeyen.notificationservice.service.NotificationService;
 import com.ercanbeyen.notificationservice.client.AuthClient;
 import com.ercanbeyen.servicecommon.client.messaging.NotificationDto;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/notifications")
+@RequiredArgsConstructor
+@SecurityRequirement(name = "Authorization")
 public class NotificationController {
     private final NotificationService notificationService;
     private final AuthClient authClient;

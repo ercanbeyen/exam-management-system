@@ -3,6 +3,7 @@ package com.ercanbeyen.schoolservice.controller;
 import com.ercanbeyen.schoolservice.validator.SchoolValidator;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.schoolservice.service.SchoolService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/schools")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Authorization")
 public class SchoolController {
     private final SchoolService schoolService;
 

@@ -13,7 +13,7 @@ spring:
         - id: EXAM-SERVICE
           uri: lb://EXAM-SERVICE
           predicates:
-            - Path=/exams/**, /exam-events/**, /exam-registrations/**
+            - Path=/exams/**, /exam-events/**, /exam-registrations/**, /EXAM-SERVICE/v3/api-docs
           filters:
             - AuthenticationFilter=USER
             - AddRequestHeader=X-Client,web
@@ -32,7 +32,7 @@ spring:
         - id: SCHOOL-SERVICE
           uri: lb://SCHOOL-SERVICE
           predicates:
-            - Path=/schools/**
+            - Path=/schools/**, /SCHOOL-SERVICE/v3/api-docs
           filters:
             - AuthenticationFilter=ADMIN
             - AddRequestHeader=X-Client,web
@@ -51,7 +51,7 @@ spring:
         - id: CANDIDATE-SERVICE
           uri: lb://CANDIDATE-SERVICE
           predicates:
-            - Path=/candidates/**
+            - Path=/candidates/**, /CANDIDATE-SERVICE/v3/api-docs
           filters:
             - AuthenticationFilter=USER
             - AddRequestHeader=X-Client,web
@@ -70,7 +70,7 @@ spring:
         - id: NOTIFICATION-SERVICE
           uri: lb://NOTIFICATION-SERVICE
           predicates:
-            - Path=/notifications/**
+            - Path=/notifications/**, /NOTIFICATION-SERVICE/v3/api-docs
           filters:
             - AuthenticationFilter=USER
             - AddRequestHeader=X-Client,web
@@ -89,7 +89,35 @@ spring:
         - id: AUTH-SERVICE
           uri: lb://AUTH-SERVICE
           predicates:
-            - Path=/auth/**
+            - Path=/auth/**, /AUTH-SERVICE/v3/api-docs
+
+springdoc:
+  enable-native-support: true
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: Gateway Server
+        primaryName: Gateway Server
+      - url: /EXAM-SERVICE/v3/api-docs
+        name: Exam Service
+        primaryName: Exam Service
+      - url: /SCHOOL-SERVICE/v3/api-docs
+        name: School Service
+        primaryName: School Service
+      - url: /CANDIDATE-SERVICE/v3/api-docs
+        name: Candidate Service
+        primaryName: Candidate Service
+      - url: /NOTIFICATION-SERVICE/v3/api-docs
+        name: Notification Service
+        primaryName: Notification Service
+      - url: /AUTH-SERVICE/v3/api-docs
+        name: Auth Service
+        primaryName: Auth Service
 
 eureka:
   client:

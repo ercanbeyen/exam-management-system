@@ -21,7 +21,12 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class AuthConfig {
+    private static final String[] ALLOWED_URLS = {
+            "/auth/**",
+            "/AUTH-SERVICE/v3/api-docs"
+    };
     private final LogoutHandler logoutHandler;
+
     @Bean
     public UserDetailsService userDetailsService() {
         return new CustomUserDetailsService();
@@ -29,9 +34,9 @@ public class AuthConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-    return httpSecurity.csrf().disable()
+        return httpSecurity.csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers(ALLOWED_URLS).permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

@@ -26,4 +26,9 @@ public class FallbackController {
     String notificationFallback() {
         return "Notification Service is unavailable";
     }
+
+    @GetMapping("/auth")
+    String authFallback() {
+        return "Auth Service is unavailable";
+    }
 }

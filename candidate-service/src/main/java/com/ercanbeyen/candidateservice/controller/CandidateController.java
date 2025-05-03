@@ -4,6 +4,7 @@ import com.ercanbeyen.candidateservice.client.AuthClient;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
 import com.ercanbeyen.candidateservice.service.CandidateService;
 import com.ercanbeyen.servicecommon.client.logging.LogMessage;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequestMapping("/candidates")
 @RequiredArgsConstructor
 @Slf4j
+@SecurityRequirement(name = "Authorization")
 public class CandidateController {
     private final CandidateService candidateService;
     private final AuthClient authClient;

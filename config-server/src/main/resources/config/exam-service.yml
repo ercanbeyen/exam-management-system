@@ -22,6 +22,12 @@ spring:
       client:
         url: http://localhost:8508
 
+springdoc:
+  api-docs:
+    path: /EXAM-SERVICE/v3/api-docs
+  swagger-ui:
+    path: /EXAM-SERVICE/swagger-ui.html
+
 eureka:
   client:
     register-with-eureka: true
