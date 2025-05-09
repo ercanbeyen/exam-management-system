@@ -159,12 +159,12 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         candidateClient.checkCandidate(username, examRegistration.getCandidateId());
 
         examRegistrationRepository.delete(examRegistration);
-        return String.format("Exam registration %s is successfully deleted", id);
+        return "Exam registration is successfully deleted";
     }
 
     private ExamRegistration findById(String id) {
         ExamRegistration examRegistration = examRegistrationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Exam registration %s is not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException("Exam registration is not found"));
 
         log.info(LogMessage.RESOURCE_FOUND, "Exam registration", id);
 

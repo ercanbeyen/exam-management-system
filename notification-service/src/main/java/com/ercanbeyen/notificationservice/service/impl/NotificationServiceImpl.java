@@ -53,12 +53,12 @@ public class NotificationServiceImpl implements NotificationService {
 
         notificationRepository.delete(notification);
 
-        return String.format("Notification %s is successfully deleted", id);
+        return "Notification is successfully deleted";
     }
 
     private Notification findById(String id) {
         Notification candidate = notificationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Notification %s is not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification is not found"));
 
         log.info(LogMessage.RESOURCE_FOUND, "Notification", id);
 

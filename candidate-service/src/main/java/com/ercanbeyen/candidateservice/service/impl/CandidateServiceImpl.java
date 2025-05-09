@@ -3,7 +3,6 @@ package com.ercanbeyen.candidateservice.service.impl;
 import com.ercanbeyen.candidateservice.client.SchoolClient;
 import com.ercanbeyen.candidateservice.entity.Candidate;
 import com.ercanbeyen.candidateservice.client.AuthClient;
-import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
 import com.ercanbeyen.candidateservice.mapper.CandidateMapper;
 import com.ercanbeyen.candidateservice.repository.CandidateRepository;
@@ -12,7 +11,6 @@ import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -93,7 +91,7 @@ public class CandidateServiceImpl implements CandidateService {
 
     private Candidate findById(String id) {
         Candidate candidate = candidateRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Candidate %s is not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate is not found"));
 
         log.info(LogMessage.RESOURCE_FOUND, "Candidate", id);
 

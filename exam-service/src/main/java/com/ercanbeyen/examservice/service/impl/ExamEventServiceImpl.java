@@ -76,13 +76,13 @@ public class ExamEventServiceImpl implements ExamEventService {
     public String deleteExamEvent(String id, String username) {
         ExamEvent examEvent = findById(id);
         examEventRepository.delete(examEvent);
-        return String.format("Exam event %s is successfully deleted", id);
+        return "Exam event is successfully deleted";
     }
 
     @Override
     public ExamEvent findById(String id) {
         ExamEvent examEvent = examEventRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Exam event %s is not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException("Exam event is not found"));
 
         log.info(LogMessage.RESOURCE_FOUND, "Exam event", id);
 
@@ -93,7 +93,7 @@ public class ExamEventServiceImpl implements ExamEventService {
     public ExamEvent findExamEventBySubjectAndLocationAndPeriod(String examSubject, ExamLocation examLocation, ExamPeriod examPeriod) {
         ExamLocation requestedExamLocation = new ExamLocation(examLocation.getSchool(), examLocation.getClassroom());
         return examEventRepository.findByExamSubjectAndExamLocationAndExamPeriod(examSubject, requestedExamLocation, examPeriod.getDate())
-                .orElseThrow(() -> new ResourceNotFoundException("Exam event not found for exam " + examSubject + " on " + examLocation + " at " +  examPeriod));
+                .orElseThrow(() -> new ResourceNotFoundException("Exam event not found"));
     }
 
     private ExamEvent constructExamEvent(String id, ExamEventDto request) {
@@ -114,7 +114,7 @@ public class ExamEventServiceImpl implements ExamEventService {
                 .anyMatch(classroomDto -> classroomDto.getName().equals(requestedLocation.getClassroom()));
 
         if (!classroomIdExists) {
-            throw new ResourceNotFoundException(String.format("Classroom %s does not found inside school %s", requestedLocation.getClassroom(), requestedLocation.getSchool()));
+            throw new ResourceNotFoundException("Classroom is not found inside the school");
         }
 
         examEvent.setExam(exam);
