@@ -233,14 +233,7 @@ public class CandidateController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Candidates are successfully fetched",
-                    content = {
-                            @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = List.class)
-                            ),
-
-                    }
+                    description = "Candidates are successfully fetched"
             ),
             @ApiResponse(
                     responseCode = "403",

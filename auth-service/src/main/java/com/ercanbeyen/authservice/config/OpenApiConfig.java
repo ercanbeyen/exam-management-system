@@ -2,21 +2,18 @@ package com.ercanbeyen.authservice.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
-import org.springdoc.core.models.GroupedOpenApi;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@OpenAPIDefinition(
-        servers = @Server(description = "Auth Service"),
-        security = @SecurityRequirement(name = "bearer")
-)
+import java.util.List;
+
+@OpenAPIDefinition
 @SecurityScheme(
         name = "Authorization",
         type = SecuritySchemeType.HTTP,
@@ -26,8 +23,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
     @Bean
-    public OpenAPI openAPI() {
+    public OpenAPI authOpenAPI() {
         return new OpenAPI()
+                .servers(List.of(new Server()
+                                .url("http://localhost:8080")
+                                .description("Auth Service API")
+                        )
+                )
                 .info(new Info()
                         .title("Exam Management System")
                         .description("Exam Management System API")
@@ -39,13 +41,5 @@ public class OpenApiConfig {
                                 .url("http://springdoc.org")
                         )
                 );
-    }
-
-    @Bean
-    public GroupedOpenApi authServiceAPI() {
-        return GroupedOpenApi.builder()
-                .group("AUTH-SERVICE")
-                .packagesToScan("com.ercanbeyen.authservice")
-                .build();
     }
 }

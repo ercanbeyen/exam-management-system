@@ -223,14 +223,7 @@ public class ExamRegistrationController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Exam entries are successfully fetched",
-                    content = {
-                            @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = List.class)
-                            ),
-
-                    }
+                    description = "Exam entries are successfully fetched"
             ),
             @ApiResponse(
                     responseCode = "403",
