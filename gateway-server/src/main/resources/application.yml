@@ -91,6 +91,12 @@ spring:
           predicates:
             - Path=/auth/**, /AUTH-SERVICE/v3/api-docs
 
+openapi:
+  service:
+    title: API Gateway Documentation
+    version: 1.0.0
+    url: http://localhost:8080
+
 springdoc:
   enable-native-support: true
   api-docs:
