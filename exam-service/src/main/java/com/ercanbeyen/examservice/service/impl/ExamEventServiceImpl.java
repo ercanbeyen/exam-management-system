@@ -15,7 +15,7 @@ import com.ercanbeyen.servicecommon.client.SchoolServiceClient;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.servicecommon.client.exception.ResourceConflictException;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
-import com.ercanbeyen.servicecommon.client.logging.LogMessage;
+import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

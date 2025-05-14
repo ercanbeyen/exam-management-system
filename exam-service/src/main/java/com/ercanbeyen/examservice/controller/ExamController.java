@@ -5,6 +5,7 @@ import com.ercanbeyen.examservice.service.ExamService;
 import com.ercanbeyen.examservice.client.AuthClient;
 import com.ercanbeyen.examservice.validator.ExamValidator;
 import com.ercanbeyen.servicecommon.client.exception.response.ErrorResponse;
+import com.ercanbeyen.servicecommon.client.response.MessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -238,7 +239,7 @@ public class ExamController {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = String.class)
+                                    schema = @Schema(implementation = MessageResponse.class)
                             ),
 
                     }
@@ -267,7 +268,7 @@ public class ExamController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteExam(
+    public ResponseEntity<MessageResponse<String>> deleteExam(
             @Parameter(
                     in = ParameterIn.PATH,
                     description = "Id of the exam",
@@ -279,6 +280,6 @@ public class ExamController {
                     required = true
             ) @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);
-        return ResponseEntity.ok(examService.deleteExam(id));
+        return ResponseEntity.ok(new MessageResponse<>(examService.deleteExam(id)));
     }
 }

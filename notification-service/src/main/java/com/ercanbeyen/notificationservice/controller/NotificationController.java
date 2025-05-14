@@ -4,6 +4,7 @@ import com.ercanbeyen.notificationservice.service.NotificationService;
 import com.ercanbeyen.notificationservice.client.AuthClient;
 import com.ercanbeyen.servicecommon.client.exception.response.ErrorResponse;
 import com.ercanbeyen.servicecommon.client.messaging.NotificationDto;
+import com.ercanbeyen.servicecommon.client.response.MessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -113,7 +114,7 @@ public class NotificationController {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = String.class)
+                                    schema = @Schema(implementation = MessageResponse.class)
                             ),
 
                     }
@@ -142,7 +143,7 @@ public class NotificationController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteNotification(
+    public ResponseEntity<MessageResponse<String>> deleteNotification(
             @Parameter(
                     in = ParameterIn.PATH,
                     description = "Id of the notification",
@@ -153,6 +154,6 @@ public class NotificationController {
                     description = "Username of the logged in user",
                     required = true
             ) @RequestHeader("loggedInUser") String username) {
-        return ResponseEntity.ok(notificationService.deleteNotification(id, username));
+        return ResponseEntity.ok(new MessageResponse<>(notificationService.deleteNotification(id, username)));
     }
 }

@@ -3,14 +3,13 @@ package com.ercanbeyen.authservice.service;
 import com.ercanbeyen.authservice.client.CandidateClient;
 import com.ercanbeyen.authservice.constant.enums.TokenStatus;
 import com.ercanbeyen.authservice.constant.message.JwtMessage;
-import com.ercanbeyen.authservice.dto.request.LoginRequest;
-import com.ercanbeyen.authservice.dto.request.RegistrationRequest;
+import com.ercanbeyen.authservice.request.LoginRequest;
+import com.ercanbeyen.authservice.request.RegistrationRequest;
 import com.ercanbeyen.authservice.entity.UserToken;
 import com.ercanbeyen.authservice.entity.UserCredential;
 import com.ercanbeyen.authservice.exception.InvalidUserCredentialException;
 import com.ercanbeyen.authservice.exception.TokenAlreadyRevokedException;
 import com.ercanbeyen.authservice.util.JwtUtil;
-import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
 import com.ercanbeyen.servicecommon.client.exception.InternalServerErrorException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,10 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 

@@ -5,6 +5,7 @@ import com.ercanbeyen.examservice.dto.response.ExamEntry;
 import com.ercanbeyen.examservice.service.ExamRegistrationService;
 import com.ercanbeyen.examservice.client.AuthClient;
 import com.ercanbeyen.servicecommon.client.exception.response.ErrorResponse;
+import com.ercanbeyen.servicecommon.client.response.MessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -260,7 +261,7 @@ public class ExamRegistrationController {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = String.class)
+                                    schema = @Schema(implementation = MessageResponse.class)
                             ),
 
                     }
@@ -289,7 +290,7 @@ public class ExamRegistrationController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteExamRegistration(
+    public ResponseEntity<MessageResponse<String>> deleteExamRegistration(
             @Parameter(
                     in = ParameterIn.PATH,
                     description = "Id of the exam registration",
@@ -300,6 +301,6 @@ public class ExamRegistrationController {
                     description = "Username of the logged in user",
                     required = true
             ) @RequestHeader("loggedInUser") String username) {
-        return ResponseEntity.ok(examRegistrationService.deleteExamRegistration(id, username));
+        return ResponseEntity.ok(new MessageResponse<>(examRegistrationService.deleteExamRegistration(id, username)));
     }
 }

@@ -4,6 +4,7 @@ import com.ercanbeyen.examservice.dto.ExamEventDto;
 import com.ercanbeyen.examservice.service.ExamEventService;
 import com.ercanbeyen.examservice.client.AuthClient;
 import com.ercanbeyen.servicecommon.client.exception.response.ErrorResponse;
+import com.ercanbeyen.servicecommon.client.response.MessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -233,7 +234,7 @@ public class ExamEventController {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = String.class)
+                                    schema = @Schema(implementation = MessageResponse.class)
                             ),
 
                     }
@@ -262,7 +263,7 @@ public class ExamEventController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteExamEvent(
+    public ResponseEntity<MessageResponse<String>> deleteExamEvent(
             @Parameter(
                     in = ParameterIn.PATH,
                     description = "Id of the exam event",
@@ -274,6 +275,6 @@ public class ExamEventController {
                     required = true
             ) @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);
-        return ResponseEntity.ok(examEventService.deleteExamEvent(id, username));
+        return ResponseEntity.ok(new MessageResponse<>(examEventService.deleteExamEvent(id, username)));
     }
 }

@@ -1,11 +1,11 @@
 package com.ercanbeyen.authservice.controller;
 
-import com.ercanbeyen.authservice.dto.request.LoginRequest;
-import com.ercanbeyen.authservice.dto.request.RegistrationRequest;
-import com.ercanbeyen.authservice.dto.response.MessageResponse;
+import com.ercanbeyen.authservice.request.LoginRequest;
+import com.ercanbeyen.authservice.request.RegistrationRequest;
 import com.ercanbeyen.authservice.entity.UserCredential;
 import com.ercanbeyen.authservice.service.AuthService;
 import com.ercanbeyen.servicecommon.client.exception.response.ErrorResponse;
+import com.ercanbeyen.servicecommon.client.response.MessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -71,14 +71,12 @@ public class AuthController {
             )
     })
     @PostMapping("/register")
-    public ResponseEntity<MessageResponse> registerUser(
+    public ResponseEntity<MessageResponse<String>> registerUser(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "User to create",
                     required = true
             ) @RequestBody @Valid RegistrationRequest request) {
-        String message = authService.register(request);
-        MessageResponse response = new MessageResponse(message);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new MessageResponse<>(authService.register(request)));
     }
 
     @Operation(summary = "Login user")
@@ -117,8 +115,7 @@ public class AuthController {
                     required = true
             ) @RequestBody @Valid LoginRequest request, HttpServletResponse servletResponse) {
         authService.login(request, servletResponse);
-        return ResponseEntity.ok()
-                .build();
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Refresh token")
@@ -153,8 +150,7 @@ public class AuthController {
     @GetMapping("/token-refresh")
     public ResponseEntity<Void> refreshToken(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         authService.refreshToken(servletRequest, servletResponse);
-        return ResponseEntity.ok()
-                .build();
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Validate token")
@@ -187,7 +183,7 @@ public class AuthController {
             )
     })
     @GetMapping("/validate")
-    public ResponseEntity<MessageResponse> validateToken(
+    public ResponseEntity<MessageResponse<String>> validateToken(
             @Parameter(
                     in = ParameterIn.QUERY,
                     description = "Access token of the user",
@@ -195,8 +191,7 @@ public class AuthController {
             ) @RequestParam("token") String token) {
         log.info("We are in AuthController::validateToken");
         authService.validateToken(token);
-        MessageResponse response = new MessageResponse("Token is valid");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new MessageResponse<>("Token is valid"));
     }
 
     @Operation(summary = "Update user credentials")
@@ -236,7 +231,7 @@ public class AuthController {
             )
     })
     @PutMapping("/{username}/roles")
-    public ResponseEntity<MessageResponse> updateUserCredential(
+    public ResponseEntity<MessageResponse<String>> updateUserCredential(
             @Parameter(
                     in = ParameterIn.PATH,
                     description = "Username of the user",
@@ -246,9 +241,7 @@ public class AuthController {
                     description = "User credentials to update",
                     required = true
             ) @RequestBody UserCredential userCredential) {
-        String message = authService.updateUserCredential(username, userCredential);
-        MessageResponse response = new MessageResponse(message);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new MessageResponse<>(authService.updateUserCredential(username, userCredential)));
     }
 
     @Operation(summary = "Get user roles")

@@ -4,7 +4,8 @@ import com.ercanbeyen.candidateservice.client.AuthClient;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
 import com.ercanbeyen.candidateservice.service.CandidateService;
 import com.ercanbeyen.servicecommon.client.exception.response.ErrorResponse;
-import com.ercanbeyen.servicecommon.client.logging.LogMessage;
+import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
+import com.ercanbeyen.servicecommon.client.response.MessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -266,7 +267,7 @@ public class CandidateController {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = String.class)
+                                    schema = @Schema(implementation = MessageResponse.class)
                             ),
 
                     }
@@ -295,7 +296,7 @@ public class CandidateController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCandidate(
+    public ResponseEntity<MessageResponse<String>> deleteCandidate(
             @Parameter(
                     in = ParameterIn.PATH,
                     description = "Id of the candidate",
@@ -306,6 +307,6 @@ public class CandidateController {
                     description = "Username of the logged in user",
                     required = true
             ) @RequestHeader("loggedInUser") String username) {
-        return ResponseEntity.ok(candidateService.deleteCandidate(id, username));
+        return ResponseEntity.ok(new MessageResponse<>(candidateService.deleteCandidate(id, username)));
     }
 }

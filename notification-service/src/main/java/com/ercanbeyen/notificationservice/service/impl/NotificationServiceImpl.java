@@ -2,7 +2,7 @@ package com.ercanbeyen.notificationservice.service.impl;
 
 import com.ercanbeyen.notificationservice.client.AuthClient;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
-import com.ercanbeyen.servicecommon.client.logging.LogMessage;
+import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import com.ercanbeyen.servicecommon.client.messaging.NotificationDto;
 import com.ercanbeyen.notificationservice.entity.Notification;
 import com.ercanbeyen.notificationservice.mapper.NotificationMapper;

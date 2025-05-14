@@ -20,14 +20,14 @@ public class FallbackController {
                     description = "Response is successfully sent",
                     content = {
                             @Content(
-                                    mediaType = "application/json",
+                                    mediaType = "text/plain",
                                     schema = @Schema(implementation = String.class)
                             ),
 
                     }
             )
     })
-    @GetMapping("/exam")
+    @GetMapping(value = "/exam")
     public ResponseEntity<String> examFallback() {
         return ResponseEntity.ok("Exam Service is unavailable");
     }
@@ -39,7 +39,7 @@ public class FallbackController {
                     description = "Response is successfully sent",
                     content = {
                             @Content(
-                                    mediaType = "application/json",
+                                    mediaType = "text/plain",
                                     schema = @Schema(implementation = String.class)
                             ),
 
@@ -58,7 +58,7 @@ public class FallbackController {
                     description = "Response is successfully sent",
                     content = {
                             @Content(
-                                    mediaType = "application/json",
+                                    mediaType = "text/plain",
                                     schema = @Schema(implementation = String.class)
                             ),
 
@@ -77,7 +77,7 @@ public class FallbackController {
                     description = "Response is successfully sent",
                     content = {
                             @Content(
-                                    mediaType = "application/json",
+                                    mediaType = "text/plain",
                                     schema = @Schema(implementation = String.class)
                             ),
 
@@ -96,7 +96,7 @@ public class FallbackController {
                     description = "Response is successfully sent",
                     content = {
                             @Content(
-                                    mediaType = "application/json",
+                                    mediaType = "text/plain",
                                     schema = @Schema(implementation = String.class)
                             ),
 

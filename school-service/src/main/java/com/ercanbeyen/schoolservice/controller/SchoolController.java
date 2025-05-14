@@ -4,6 +4,7 @@ import com.ercanbeyen.schoolservice.validator.SchoolValidator;
 import com.ercanbeyen.servicecommon.client.contract.SchoolDto;
 import com.ercanbeyen.schoolservice.service.SchoolService;
 import com.ercanbeyen.servicecommon.client.exception.response.ErrorResponse;
+import com.ercanbeyen.servicecommon.client.response.MessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -203,7 +204,7 @@ public class SchoolController {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = String.class)
+                                    schema = @Schema(implementation = MessageResponse.class)
                             ),
 
                     }
@@ -232,12 +233,12 @@ public class SchoolController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteSchool(
+    public ResponseEntity<MessageResponse<String>> deleteSchool(
             @Parameter(
                     in = ParameterIn.PATH,
                     description = "Id of the school",
                     required = true
             ) @PathVariable String id) {
-        return ResponseEntity.ok(schoolService.deleteSchool(id));
+        return ResponseEntity.ok(new MessageResponse<>(schoolService.deleteSchool(id)));
     }
 }

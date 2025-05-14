@@ -3,7 +3,7 @@ package com.ercanbeyen.candidateservice.client;
 import com.ercanbeyen.servicecommon.client.AuthServiceClient;
 import com.ercanbeyen.servicecommon.client.auth.Role;
 import com.ercanbeyen.servicecommon.client.exception.ResourceForbiddenException;
-import com.ercanbeyen.servicecommon.client.response.ResponseMessage;
+import com.ercanbeyen.servicecommon.client.message.response.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

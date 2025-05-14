@@ -1,6 +1,6 @@
 package com.ercanbeyen.authservice.client;
 
-import com.ercanbeyen.authservice.dto.request.RegistrationRequest;
+import com.ercanbeyen.authservice.request.RegistrationRequest;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
