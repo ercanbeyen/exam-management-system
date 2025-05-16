@@ -308,13 +308,20 @@ public class AuthController {
             )
     })
     @GetMapping("/extract/username")
-    public String extractUsername(
+    public ResponseEntity<String> extractUsername(
             @Parameter(
                     in = ParameterIn.QUERY,
                     description = "Extract username of the user",
-                    required = true
+                    required = true,
+                    content = {
+                            @Content(
+                                    mediaType = "text/plain",
+                                    schema = @Schema(implementation = String.class)
+                            ),
+
+                    }
             ) @RequestParam("token") String token) {
-        return authService.extractUsername(token);
+        return ResponseEntity.ok(authService.extractUsername(token));
     }
 
     @Operation(summary = "Check requested role from the user")
@@ -325,7 +332,7 @@ public class AuthController {
             )
     })
     @GetMapping("/check-role")
-    public Boolean checkRole(
+    public ResponseEntity<Boolean> checkRole(
             @Parameter(
                     in = ParameterIn.QUERY,
                     description = "Access token of the user",
@@ -337,7 +344,7 @@ public class AuthController {
                     required = true
             ) @RequestParam("role") String role) {
         log.info("We are in AuthController::checkRole. Role {}", role);
-        return authService.checkRole(token, role);
+        return ResponseEntity.ok(authService.checkRole(token, role));
     }
 
     @Operation(summary = "Check requested role from the user")
@@ -359,7 +366,7 @@ public class AuthController {
                     description = "Requested role to check",
                     required = true
             ) @RequestParam("role") String role) {
-        log.info("We are in AuthController::checkUserRole. Role {}", role);
+        log.info("We are in AuthController::checkUserRole. Requested role {}", role);
         boolean response = authService.checkUserRole(username, role);
         log.info("Response: {}", response);
         return ResponseEntity.ok(response);

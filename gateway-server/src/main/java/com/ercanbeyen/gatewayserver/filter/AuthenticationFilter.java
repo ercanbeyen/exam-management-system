@@ -52,15 +52,17 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
                 try {
                     restTemplate.getForObject(AUTH_URL + "/validate?token=" + authHeader, String.class);
-                    Boolean checkRoleResponse = restTemplate.getForObject(AUTH_URL + "/check-role?role={role}&token={token}", Boolean.class, config.getRole(), authHeader);
-                    assert checkRoleResponse != null;
+                    Boolean hasRole = restTemplate.getForObject(AUTH_URL + "/check-role?role={role}&token={token}", Boolean.class, config.getRole(), authHeader);
+                    assert hasRole != null;
 
-                    if (!checkRoleResponse) {
+                    if (!hasRole) {
                         log.error("Access denied for user");
                         return constructResponse(exchange, HttpStatus.FORBIDDEN);
                     }
 
                     String username = restTemplate.getForObject(AUTH_URL + "/extract/username?token=" + authHeader, String.class);
+                    assert username != null;
+
                     serverHttpRequest = exchange.getRequest()
                             .mutate()
                             .header("loggedInUser", username)
