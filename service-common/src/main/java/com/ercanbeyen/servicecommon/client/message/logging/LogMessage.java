@@ -1,4 +1,4 @@
-package com.ercanbeyen.servicecommon.client.logging;
+package com.ercanbeyen.servicecommon.client.message.logging;
 
 public class LogMessage {
     public static final String RESOURCE_FOUND = "{} {} is found";

@@ -2,7 +2,7 @@ package com.ercanbeyen.examservice.service.impl;
 
 import com.ercanbeyen.examservice.dto.ExamEventDto;
 import com.ercanbeyen.examservice.service.ExamEventNotificationService;
-import com.ercanbeyen.servicecommon.client.logging.LogMessage;
+import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import com.ercanbeyen.servicecommon.client.messaging.ChannelTopic;
 import com.ercanbeyen.servicecommon.client.messaging.NotificationDto;
 import lombok.RequiredArgsConstructor;

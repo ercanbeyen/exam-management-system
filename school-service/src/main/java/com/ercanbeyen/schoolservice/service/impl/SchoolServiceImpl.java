@@ -7,7 +7,7 @@ import com.ercanbeyen.schoolservice.repository.SchoolRepository;
 import com.ercanbeyen.schoolservice.service.SchoolService;
 import com.ercanbeyen.servicecommon.client.exception.ResourceConflictException;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
-import com.ercanbeyen.servicecommon.client.logging.LogMessage;
+import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -66,7 +66,7 @@ public class SchoolServiceImpl implements SchoolService {
     @Override
     public School findById(String id) {
         School school = schoolRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("School %s is not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException("School is not found"));
 
         log.info(LogMessage.RESOURCE_FOUND, "School", id);
 
@@ -75,7 +75,7 @@ public class SchoolServiceImpl implements SchoolService {
 
     private School findByName(String name) {
         School school = schoolRepository.findByName(name)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("School %s is not found", name)));
+                .orElseThrow(() -> new ResourceNotFoundException("School is not found"));
 
         log.info(LogMessage.RESOURCE_FOUND, "School", name);
 
@@ -86,7 +86,7 @@ public class SchoolServiceImpl implements SchoolService {
         String name = request.name();
 
         if (schoolRepository.existsByName(name)) {
-            throw new ResourceConflictException(String.format("School %s already exists", name));
+            throw new ResourceConflictException("School already exists");
         }
 
         log.info("School {} has not existed before", name);

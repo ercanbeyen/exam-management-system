@@ -18,7 +18,7 @@ import com.ercanbeyen.examservice.service.ExamService;
 import com.ercanbeyen.examservice.validator.ExamRegistrationValidator;
 import com.ercanbeyen.servicecommon.client.exception.ResourceConflictException;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
-import com.ercanbeyen.servicecommon.client.logging.LogMessage;
+import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -159,12 +159,12 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         candidateClient.checkCandidate(username, examRegistration.getCandidateId());
 
         examRegistrationRepository.delete(examRegistration);
-        return String.format("Exam registration %s is successfully deleted", id);
+        return "Exam registration is successfully deleted";
     }
 
     private ExamRegistration findById(String id) {
         ExamRegistration examRegistration = examRegistrationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Exam registration %s is not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException("Exam registration is not found"));
 
         log.info(LogMessage.RESOURCE_FOUND, "Exam registration", id);
 

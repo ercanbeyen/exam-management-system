@@ -39,6 +39,18 @@ spring:
         brokers:
           - localhost:9092
 
+openapi:
+  service:
+    title: Notification Service API Documentation
+    version: 1.0.0
+    url: http://localhost:8080
+
+springdoc:
+  api-docs:
+    path: /NOTIFICATION-SERVICE/v3/api-docs
+  swagger-ui:
+    path: /NOTIFICATION-SERVICE/swagger-ui.html
+
 eureka:
   client:
     register-with-eureka: true

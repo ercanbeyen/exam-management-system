@@ -3,12 +3,14 @@ package com.ercanbeyen.authservice.advice;
 import com.ercanbeyen.authservice.exception.InvalidUserCredentialException;
 import com.ercanbeyen.authservice.exception.TokenAlreadyRevokedException;
 import com.ercanbeyen.authservice.exception.UserAlreadyExistException;
+import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.exception.response.ErrorResponse;
 import com.ercanbeyen.servicecommon.client.exception.constant.GlobalErrorCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -43,6 +45,14 @@ public class AuthServiceGlobalExceptionHandler {
         log.error("AuthServiceGlobalExceptionHandler::handleResourceConflictException exception caught {}", exception.getMessage());
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT, GlobalErrorCode.AUTH_CONFLICT_ERROR, exception.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(errorResponse);
+    }
+
+    @ExceptionHandler({ResourceNotFoundException.class, UsernameNotFoundException.class})
+    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(Exception exception) {
+        log.error("AuthServiceGlobalExceptionHandler::handleResourceNotFoundException exception caught {}", exception.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, GlobalErrorCode.AUTH_NOT_FOUND_ERROR, exception.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(errorResponse);
     }
 

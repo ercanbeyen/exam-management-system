@@ -6,7 +6,7 @@ import com.ercanbeyen.examservice.repository.ExamRepository;
 import com.ercanbeyen.examservice.service.ExamService;
 import com.ercanbeyen.examservice.entity.Exam;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
-import com.ercanbeyen.servicecommon.client.logging.LogMessage;
+import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,13 +52,13 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public String deleteExam(String id) {
         examRepository.deleteById(id);
-        return String.format("Exam %s is successfully deleted", id);
+        return "Exam is successfully deleted";
     }
 
     @Override
     public Exam findById(String id) {
         Exam exam = examRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Exam %s is not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException("Exam is not found"));
 
         log.info(LogMessage.RESOURCE_FOUND, "Exam", id);
 
@@ -68,7 +68,7 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public Exam findBySubject(String subject) {
         Exam exam = examRepository.findBySubject(subject)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Exam %s is not found", subject)));
+                .orElseThrow(() -> new ResourceNotFoundException("Exam is not found"));
 
         log.info(LogMessage.RESOURCE_FOUND, "Exam", subject);
 

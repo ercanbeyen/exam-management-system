@@ -2,7 +2,7 @@ package com.ercanbeyen.notificationservice.service.impl;
 
 import com.ercanbeyen.notificationservice.client.AuthClient;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
-import com.ercanbeyen.servicecommon.client.logging.LogMessage;
+import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import com.ercanbeyen.servicecommon.client.messaging.NotificationDto;
 import com.ercanbeyen.notificationservice.entity.Notification;
 import com.ercanbeyen.notificationservice.mapper.NotificationMapper;
@@ -53,12 +53,12 @@ public class NotificationServiceImpl implements NotificationService {
 
         notificationRepository.delete(notification);
 
-        return String.format("Notification %s is successfully deleted", id);
+        return "Notification is successfully deleted";
     }
 
     private Notification findById(String id) {
         Notification candidate = notificationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Notification %s is not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification is not found"));
 
         log.info(LogMessage.RESOURCE_FOUND, "Notification", id);
 

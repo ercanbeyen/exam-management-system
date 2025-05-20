@@ -3,6 +3,7 @@ package com.ercanbeyen.examservice.client;
 import com.ercanbeyen.servicecommon.client.AuthServiceClient;
 import com.ercanbeyen.servicecommon.client.auth.Role;
 import com.ercanbeyen.servicecommon.client.exception.ResourceForbiddenException;
+import com.ercanbeyen.servicecommon.client.message.response.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class AuthClient {
 
         if (!userHasAdminRole(username)) {
             log.error("User does not have {} role", role);
-            throw new ResourceForbiddenException(String.format("User %s is not authorized", username));
+            throw new ResourceForbiddenException(ResponseMessage.UNAUTHORIZED_ACCESS);
         }
 
         log.info("User {} has {} role", username, role);
@@ -30,7 +31,7 @@ public class AuthClient {
     public void checkLoggedInUser(String candidateUsername, String loggedInUsername) {
         if (!candidateUsername.equals(loggedInUsername)) {
             log.error("Usernames are not matching: {} & {}", candidateUsername, loggedInUsername);
-            throw new ResourceForbiddenException("Unauthorized access");
+            throw new ResourceForbiddenException(ResponseMessage.UNAUTHORIZED_ACCESS);
         }
 
         log.info("Notification belongs to user {}", loggedInUsername);

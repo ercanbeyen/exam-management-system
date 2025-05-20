@@ -2,7 +2,7 @@ package com.ercanbeyen.examservice.client;
 
 import com.ercanbeyen.servicecommon.client.CandidateServiceClient;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
-import com.ercanbeyen.servicecommon.client.logging.LogMessage;
+import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

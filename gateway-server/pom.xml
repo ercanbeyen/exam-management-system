@@ -18,6 +18,7 @@
 
 	<properties>
 		<jsonwebtoken>0.11.5</jsonwebtoken>
+		<openapi_webflux>2.8.6</openapi_webflux>
 	</properties>
 
 	<dependencies>
@@ -65,6 +66,11 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+			<version>${openapi_webflux}</version>
 		</dependency>
 	</dependencies>
 

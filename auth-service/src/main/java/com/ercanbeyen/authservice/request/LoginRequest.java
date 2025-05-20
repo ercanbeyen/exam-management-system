@@ -1,4 +1,4 @@
-package com.ercanbeyen.authservice.dto.request;
+package com.ercanbeyen.authservice.request;
 
 
 import jakarta.validation.constraints.NotBlank;

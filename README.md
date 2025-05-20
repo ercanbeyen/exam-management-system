@@ -15,7 +15,7 @@ Services:
 - School: 8083
 - Notification: 8084
 
-Server:
+Servers:
 - Admin: 8508
 - Config: 8888
 - Eureka: 8761
@@ -70,3 +70,9 @@ Then you should run the following applications in order
 ---
 - Use Admin Server to monitor health of services.
 - Use Zipkin Server to trace requests.
+
+### Api Documentation
+---
+You may use Swagger-UI with the port of the application you configured to access the project's api documentation.<br/>
+You should use the below url to access the Swagger-UI.<br/>
+`http://localhost:${PORT}/swagger-ui.html`

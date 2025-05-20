@@ -1,6 +1,7 @@
 package com.ercanbeyen.servicecommon.client.exception.constant;
 
 public class GlobalErrorCode {
+    public static final String AUTH_NOT_FOUND_ERROR = "AUTH-SERVICE-1002";
     public static final String AUTH_CONFLICT_ERROR = "AUTH-SERVICE-1004";
     public static final String AUTH_EXPECTATION_FAILED_ERROR = "AUTH-SERVICE-1005";
 

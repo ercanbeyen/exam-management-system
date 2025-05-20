@@ -16,6 +16,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userCredentialService.findUserCredentialByUsername(username)
                 .map(CustomUserDetails::new)
-                .orElseThrow(() -> new UsernameNotFoundException("Username is not found " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("Username is not found"));
     }
 }
