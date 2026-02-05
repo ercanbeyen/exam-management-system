@@ -2,6 +2,7 @@ package com.ercanbeyen.examservice.service;
 
 import com.ercanbeyen.examservice.dto.ExamRegistrationDto;
 import com.ercanbeyen.examservice.dto.response.ExamEntry;
+import com.ercanbeyen.examservice.entity.ExamRegistration;
 
 import java.util.List;
 
@@ -12,4 +13,5 @@ public interface ExamRegistrationService {
     List<ExamRegistrationDto> getExamRegistrations(String username);
     List<ExamEntry> getExamEntries(String examEventId, String username);
     String deleteExamRegistration(String id, String username);
+    ExamRegistration findById(String id);
 }

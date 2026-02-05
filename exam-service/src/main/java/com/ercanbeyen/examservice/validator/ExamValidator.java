@@ -18,7 +18,7 @@ public class ExamValidator {
     }
 
     private void checkExamPeriod(ExamDto request) {
-        ExamPeriod examPeriod = request.period();
+        ExamPeriod examPeriod = request.examPeriod();
         RegistrationPeriod registrationPeriod = request.registrationPeriod();
 
         if (!examPeriod.getStartTime().isBefore(examPeriod.getFinishTime())) {
@@ -29,7 +29,7 @@ public class ExamValidator {
             throw new BadRequestException("Exam date must be after than registration end date");
         }
 
-        log.info("Exam period is valid");
+        log.info("Exam examPeriod is valid");
     }
 
     private void checkRegistrationPeriod(ExamDto request) {
@@ -43,6 +43,6 @@ public class ExamValidator {
             throw new BadRequestException("Registration end date must after than now");
         }
 
-        log.info("Registration period is valid");
+        log.info("Registration examPeriod is valid");
     }
 }

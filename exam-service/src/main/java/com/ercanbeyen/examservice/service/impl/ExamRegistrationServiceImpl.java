@@ -162,7 +162,8 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         return "Exam registration is successfully deleted";
     }
 
-    private ExamRegistration findById(String id) {
+    @Override
+    public ExamRegistration findById(String id) {
         ExamRegistration examRegistration = examRegistrationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Exam registration is not found"));
 

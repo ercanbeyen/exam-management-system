@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
+@Table(name = "exam_registrations")
 public class ExamRegistration {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

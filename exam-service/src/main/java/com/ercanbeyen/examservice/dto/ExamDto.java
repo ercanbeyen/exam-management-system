@@ -14,7 +14,7 @@ public record ExamDto(
         @Valid
         RegistrationPeriod registrationPeriod,
         @Valid
-        ExamPeriod period,
+        ExamPeriod examPeriod,
         List<String> examEventIds) {
 
 }
