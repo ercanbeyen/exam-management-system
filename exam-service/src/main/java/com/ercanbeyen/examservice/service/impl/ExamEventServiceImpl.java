@@ -51,7 +51,7 @@ public class ExamEventServiceImpl implements ExamEventService {
     }
 
     @Override
-    public ExamEventDto updateExamEvent(String id, ExamEventDto request, String username) {
+    public ExamEventDto updateExamEvent(String id, ExamEventDto request) {
         checkProctors(request);
         checkExamEventConflicts(request);
 
@@ -162,9 +162,7 @@ public class ExamEventServiceImpl implements ExamEventService {
     }
 
     private void checkProctors(ExamEventDto request) {
-        request.proctors()
-                .forEach(candidateClient::checkCandidateByUsername);
-
+        request.proctors().forEach(candidateClient::checkCandidateByUsername);
         log.info("Proctors exist");
     }
 }

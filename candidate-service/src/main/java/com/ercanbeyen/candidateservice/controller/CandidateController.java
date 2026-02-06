@@ -227,7 +227,8 @@ public class CandidateController {
                     required = true
             ) @RequestHeader("loggedInUser") String loggedInUsername) {
         log.info(LogMessage.LOGGED_IN_USER, loggedInUsername);
-        return ResponseEntity.ok(candidateService.getCandidateByUsername(username, loggedInUsername));
+        authClient.checkLoggedInUser(username, loggedInUsername);
+        return ResponseEntity.ok(candidateService.getCandidateByUsername(username));
     }
 
     @Operation(summary = "Get candidates")

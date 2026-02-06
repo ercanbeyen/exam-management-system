@@ -42,15 +42,15 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
 
     @Override
     public ExamRegistrationDto createExamRegistration(ExamRegistrationDto request, String username) {
+        String candidateId = request.candidateId();
+        candidateClient.checkCandidate(candidateId, username);
+
         ExamEventDto examEventDto = request.examEventDto();
         Exam exam = examService.findBySubject(examEventDto.examSubject());
         ExamEvent examEvent = examEventService.findExamEventBySubjectAndLocationAndPeriod(
                 examEventDto.examSubject(), examEventDto.location(), exam.getExamPeriod());
 
         ExamRegistrationValidator.checkExamRegistrationPeriod(examEvent.getExam());
-
-        String candidateId = request.candidateId();
-        candidateClient.checkCandidate(username, candidateId);
 
         checkIsUserProctorInExam(username, exam);
 
@@ -91,7 +91,7 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
                 examEventDto.examSubject(), examEventDto.location(), exam.getExamPeriod());
 
         String candidateId = request.candidateId();
-        candidateClient.checkCandidate(username, candidateId);
+        candidateClient.checkCandidate(candidateId, username);
 
         if (!examEvent.getId().equals(examRegistration.getExamEvent().getId())) {
             log.info("Classroom of candidate may check. Classroom capacity must be checked before update");
@@ -107,15 +107,13 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     @Override
     public ExamRegistrationDto getExamRegistration(String id, String username) {
         ExamRegistration examRegistration = findById(id);
-        candidateClient.checkCandidate(username, id);
-
+        candidateClient.checkCandidate(examRegistration.getCandidateId(), username);
         return examRegistrationMapper.entityToDto(examRegistration);
     }
 
     @Override
     public List<ExamRegistrationDto> getExamRegistrations(String username) {
-        String candidateId = candidateClient.getCandidateId(username);
-
+        String candidateId = candidateClient.getCandidateIdByUsername(username);
         return examRegistrationRepository.findAllByCandidateId(candidateId)
                 .stream()
                 .map(examRegistrationMapper::entityToDto)
@@ -156,7 +154,7 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     public String deleteExamRegistration(String id, String username) {
         ExamRegistration examRegistration = findById(id);
         ExamRegistrationValidator.checkExamRegistrationPeriod(examRegistration.getExamEvent().getExam());
-        candidateClient.checkCandidate(username, examRegistration.getCandidateId());
+        candidateClient.checkCandidate(examRegistration.getCandidateId(), username);
 
         examRegistrationRepository.delete(examRegistration);
         return "Exam registration is successfully deleted";

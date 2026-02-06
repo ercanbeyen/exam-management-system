@@ -144,7 +144,7 @@ public class ExamEventController {
                     required = true
             ) @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);
-        return ResponseEntity.ok(examEventService.updateExamEvent(id, request, username));
+        return ResponseEntity.ok(examEventService.updateExamEvent(id, request));
     }
 
     @Operation(summary = "Get exam event")

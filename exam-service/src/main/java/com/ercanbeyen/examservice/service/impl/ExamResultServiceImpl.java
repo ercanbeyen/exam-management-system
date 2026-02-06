@@ -1,5 +1,6 @@
 package com.ercanbeyen.examservice.service.impl;
 
+import com.ercanbeyen.examservice.client.CandidateClient;
 import com.ercanbeyen.examservice.dto.ExamResultDto;
 import com.ercanbeyen.examservice.entity.ExamRegistration;
 import com.ercanbeyen.examservice.entity.ExamResult;
@@ -22,6 +23,7 @@ public class ExamResultServiceImpl implements ExamResultService {
     private final ExamResultRepository examResultRepository;
     private final ExamResultMapper examResultMapper;
     private final ExamRegistrationService examRegistrationService;
+    private final CandidateClient candidateClient;
 
     @Override
     public ExamResultDto createExamResult(ExamResultDto request) {
@@ -44,8 +46,10 @@ public class ExamResultServiceImpl implements ExamResultService {
     }
 
     @Override
-    public ExamResultDto getExamResult(String id) {
-        return examResultMapper.entityToDto(findById(id));
+    public ExamResultDto getExamResult(String id, String username) {
+        ExamResult examResult = findById(id);
+        candidateClient.checkCandidate(examResult.getCandidateId(), username);
+        return examResultMapper.entityToDto(examResult);
     }
 
     @Override
