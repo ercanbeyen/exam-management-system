@@ -36,9 +36,9 @@ public class ExamResultController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ExamResultDto>> getExamResults(@RequestHeader("loggedInUser") String username) {
+    public ResponseEntity<List<ExamResultDto>> getExamResults(@RequestParam("subject") String subject, @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);
-        return ResponseEntity.ok(examResultService.getExamResults());
+        return ResponseEntity.ok(examResultService.getExamResults(subject));
     }
 
     @DeleteMapping("/{id}")

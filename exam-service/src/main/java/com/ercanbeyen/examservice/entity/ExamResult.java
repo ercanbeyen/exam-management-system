@@ -10,7 +10,7 @@ public class ExamResult {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    @ManyToOne
+    @OneToOne
     private ExamRegistration examRegistration;
     private String candidateId;
     private Double score;

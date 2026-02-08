@@ -4,7 +4,6 @@ import com.ercanbeyen.candidateservice.client.AuthClient;
 import com.ercanbeyen.servicecommon.client.contract.CandidateDto;
 import com.ercanbeyen.candidateservice.service.CandidateService;
 import com.ercanbeyen.servicecommon.client.exception.response.ErrorResponse;
-import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import com.ercanbeyen.servicecommon.client.response.MessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -181,7 +180,6 @@ public class CandidateController {
                     description = "Username of the logged in user",
                     required = true
             ) @RequestHeader("loggedInUser") String username) {
-        log.info(LogMessage.LOGGED_IN_USER, username);
         return ResponseEntity.ok(candidateService.getCandidate(id, username));
     }
 
@@ -214,21 +212,20 @@ public class CandidateController {
                     )
             )
     })
-    @GetMapping("/users/{username}")
+    @GetMapping("/users/{candidateUsername}")
     public ResponseEntity<CandidateDto> getCandidateByUsername(
             @Parameter(
                     in = ParameterIn.PATH,
                     description = "Username of the candidate",
                     required = true
-            ) @PathVariable("username") String username,
+            ) @PathVariable("candidateUsername") String candidateUsername,
             @Parameter(
                     in = ParameterIn.HEADER,
                     description = "Username of the logged in user",
                     required = true
             ) @RequestHeader("loggedInUser") String loggedInUsername) {
-        log.info(LogMessage.LOGGED_IN_USER, loggedInUsername);
-        authClient.checkLoggedInUser(username, loggedInUsername);
-        return ResponseEntity.ok(candidateService.getCandidateByUsername(username));
+        authClient.checkLoggedInUser(candidateUsername, loggedInUsername);
+        return ResponseEntity.ok(candidateService.getCandidateByUsername(candidateUsername));
     }
 
     @Operation(summary = "Get candidates")

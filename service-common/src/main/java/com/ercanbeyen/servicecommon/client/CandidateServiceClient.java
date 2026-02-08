@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface CandidateServiceClient {
     @GetMapping("/candidates/{id}")
     ResponseEntity<CandidateDto> getCandidate(@PathVariable("id") String id, @RequestHeader("loggedInUser") String username);
-    @GetMapping("/candidates/users/{username}")
-    ResponseEntity<CandidateDto> getCandidateByUsername(@PathVariable("username") String username, @RequestHeader("loggedInUser") String loggedInUsername);
+    @GetMapping("/candidates/users/{candidateUsername}")
+    ResponseEntity<CandidateDto> getCandidateByUsername(@PathVariable("candidateUsername") String candidateUsername, @RequestHeader("loggedInUser") String loggedInUsername);
 }

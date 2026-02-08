@@ -25,8 +25,8 @@ public class CandidateClient {
         log.info(LogMessage.RESOURCE_FOUND, CANDIDATE, username);
     }
 
-    public String getCandidateIdByUsername(String loggedInUsername) {
-        ResponseEntity<CandidateDto> candidateServiceResponse = candidateServiceClient.getCandidateByUsername(loggedInUsername, loggedInUsername);
+    public String getCandidateIdByUsername(String username) {
+        ResponseEntity<CandidateDto> candidateServiceResponse = candidateServiceClient.getCandidateByUsername(username, username);
         log.debug(LogMessage.CLIENT_SERVICE_RESPONSE, CANDIDATE, candidateServiceResponse);
 
         assert candidateServiceResponse.getBody() != null;

@@ -53,9 +53,10 @@ public class ExamResultServiceImpl implements ExamResultService {
     }
 
     @Override
-    public List<ExamResultDto> getExamResults() {
+    public List<ExamResultDto> getExamResults(String subject) {
         return examResultRepository.findAll()
                 .stream()
+                .filter(examResult -> examResult.getExamRegistration().getExamEvent().getExam().getSubject().equals(subject))
                 .map(examResultMapper::entityToDto)
                 .toList();
     }
