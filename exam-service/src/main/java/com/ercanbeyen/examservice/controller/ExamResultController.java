@@ -1,10 +1,12 @@
 package com.ercanbeyen.examservice.controller;
 
 import com.ercanbeyen.examservice.client.AuthClient;
+import com.ercanbeyen.examservice.client.CandidateClient;
 import com.ercanbeyen.examservice.dto.ExamResultDto;
 import com.ercanbeyen.examservice.service.ExamResultService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +19,7 @@ import java.util.List;
 public class ExamResultController {
     private final ExamResultService examResultService;
     private final AuthClient authClient;
+    private final CandidateClient candidateClient;
 
     @PostMapping
     public ResponseEntity<ExamResultDto> createExamResult(@RequestBody ExamResultDto request, @RequestHeader("loggedInUser") String username) {
@@ -39,6 +42,16 @@ public class ExamResultController {
     public ResponseEntity<List<ExamResultDto>> getExamResults(@RequestParam("subject") String subject, @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);
         return ResponseEntity.ok(examResultService.getExamResults(subject));
+    }
+
+    @GetMapping("/candidates/{candidateId}")
+    public ResponseEntity<Page<ExamResultDto>> getExamResultsOfCandidate(
+            @PathVariable("candidateId") String candidateId,
+            @RequestParam("page") Integer pageNumber,
+            @RequestParam("size") Integer pageSize,
+            @RequestHeader("loggedInUsername") String username) {
+        candidateClient.checkCandidate(candidateId, username);
+        return ResponseEntity.ok(examResultService.getExamResultsOfCandidate(candidateId, pageNumber, pageSize));
     }
 
     @DeleteMapping("/{id}")

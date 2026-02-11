@@ -12,6 +12,10 @@ import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,6 +63,15 @@ public class ExamResultServiceImpl implements ExamResultService {
                 .filter(examResult -> examResult.getExamRegistration().getExamEvent().getExam().getSubject().equals(subject))
                 .map(examResultMapper::entityToDto)
                 .toList();
+    }
+
+    @Override
+    public Page<ExamResultDto> getExamResultsOfCandidate(String candidateId, int pageNumber, int pageSize) {
+        Sort sort = Sort.by("score")
+                .descending()
+                .and(Sort.by("candidateId").ascending());
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
+        return examResultRepository.findAllByCandidateId(candidateId, pageable).map(examResultMapper::entityToDto);
     }
 
     @Override
