@@ -21,8 +21,10 @@ import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,8 +89,7 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         ExamRegistrationValidator.checkExamRegistrationPeriod(exam);
 
         ExamEventDto examEventDto = request.examEventDto();
-        ExamEvent examEvent = examEventService.findExamEventBySubjectAndLocationAndPeriod(
-                examEventDto.examSubject(), examEventDto.location(), exam.getExamPeriod());
+        ExamEvent examEvent = examEventService.findExamEventBySubjectAndLocationAndPeriod(examEventDto.examSubject(), examEventDto.location(), exam.getExamPeriod());
 
         String candidateId = request.candidateId();
         candidateClient.checkCandidate(candidateId, username);
@@ -112,12 +113,16 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     }
 
     @Override
-    public List<ExamRegistrationDto> getExamRegistrations(String username) {
+    public Page<ExamRegistrationDto> getExamRegistrations(String username, int pageNumber, int pageSize) {
         String candidateId = candidateClient.getCandidateIdByUsername(username);
-        return examRegistrationRepository.findAllByCandidateId(candidateId)
-                .stream()
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by("updatedAt", "createdAt").descending());
+
+        List<ExamRegistrationDto> examRegistrationDtos = examRegistrationRepository.findAllByCandidateId(candidateId, pageable)
+                .filter(examRegistration -> examRegistration.getExamEvent().getExam().getExamPeriod().getDate().isAfter(LocalDate.now()))
                 .map(examRegistrationMapper::entityToDto)
                 .toList();
+
+        return new PageImpl<>(examRegistrationDtos);
     }
 
     @Override
@@ -141,9 +146,7 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         examRegistrationRepository.findAllByExamEvent(examEvent)
                 .forEach(examRegistration -> {
                     Exam exam = examEvent.getExam();
-
                     ExamEntry examEntry = new ExamEntry(examRegistration.getCandidateId(), exam.getSubject(), examEvent.getLocation(), exam.getExamPeriod());
-
                     examEntries.add(examEntry);
                 });
 

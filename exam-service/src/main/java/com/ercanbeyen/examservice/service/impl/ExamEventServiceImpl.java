@@ -93,7 +93,7 @@ public class ExamEventServiceImpl implements ExamEventService {
     public ExamEvent findExamEventBySubjectAndLocationAndPeriod(String examSubject, ExamLocation examLocation, ExamPeriod examPeriod) {
         ExamLocation requestedExamLocation = new ExamLocation(examLocation.getSchool(), examLocation.getClassroom());
         return examEventRepository.findByExamSubjectAndExamLocationAndExamPeriod(examSubject, requestedExamLocation, examPeriod.getDate())
-                .orElseThrow(() -> new ResourceNotFoundException("Exam event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Exam event is not found"));
     }
 
     private ExamEvent constructExamEvent(String id, ExamEventDto request) {

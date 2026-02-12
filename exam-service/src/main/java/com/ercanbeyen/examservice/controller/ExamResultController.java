@@ -47,9 +47,9 @@ public class ExamResultController {
     @GetMapping("/candidates/{candidateId}")
     public ResponseEntity<Page<ExamResultDto>> getExamResultsOfCandidate(
             @PathVariable("candidateId") String candidateId,
-            @RequestParam("page") Integer pageNumber,
-            @RequestParam("size") Integer pageSize,
-            @RequestHeader("loggedInUsername") String username) {
+            @RequestParam(name = "page", defaultValue = "1") Integer pageNumber,
+            @RequestParam(name = "size", defaultValue = "5") Integer pageSize,
+            @RequestHeader("loggedInUser") String username) {
         candidateClient.checkCandidate(candidateId, username);
         return ResponseEntity.ok(examResultService.getExamResultsOfCandidate(candidateId, pageNumber, pageSize));
     }

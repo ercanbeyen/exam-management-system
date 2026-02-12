@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -205,19 +206,27 @@ public class ExamRegistrationController {
             )
     })
     @GetMapping
-    public ResponseEntity<List<ExamRegistrationDto>> getExamRegistrations(
+    public ResponseEntity<Page<ExamRegistrationDto>> getExamRegistrations(
             @Parameter(
                     in = ParameterIn.QUERY,
                     description = "Username of the candidate",
                     required = true
             ) @RequestParam("user") String candidateUsername,
             @Parameter(
+                    in = ParameterIn.QUERY,
+                    description = "Page number"
+            ) @RequestParam(name = "page", defaultValue = "1") Integer pageNumber,
+            @Parameter(
+                    in = ParameterIn.QUERY,
+                    description = "Page size"
+            ) @RequestParam(name = "size", defaultValue = "5") Integer pageSize,
+            @Parameter(
                     in = ParameterIn.HEADER,
                     description = "Username of the logged in user",
                     required = true
             ) @RequestHeader("loggedInUser") String loggedInUsername) {
         authClient.checkLoggedInUser(candidateUsername, loggedInUsername);
-        return ResponseEntity.ok(examRegistrationService.getExamRegistrations(candidateUsername));
+        return ResponseEntity.ok(examRegistrationService.getExamRegistrations(candidateUsername, pageNumber, pageSize));
     }
 
     @Operation(summary = "Get exam entries")
@@ -249,8 +258,8 @@ public class ExamRegistrationController {
                     in = ParameterIn.HEADER,
                     description = "Username of the logged in user",
                     required = true
-            ) @RequestHeader("loggedInUser") String loggedInUsername) {
-        return ResponseEntity.ok(examRegistrationService.getExamEntries(examEventId, loggedInUsername));
+            ) @RequestHeader("loggedInUser") String username) {
+        return ResponseEntity.ok(examRegistrationService.getExamEntries(examEventId, username));
     }
 
     @Operation(summary = "Delete exam registration by its id")
