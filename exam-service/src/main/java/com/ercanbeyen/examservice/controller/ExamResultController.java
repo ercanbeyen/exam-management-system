@@ -5,6 +5,7 @@ import com.ercanbeyen.examservice.client.CandidateClient;
 import com.ercanbeyen.examservice.dto.ExamResultDto;
 import com.ercanbeyen.examservice.service.ExamResultService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +23,13 @@ public class ExamResultController {
     private final CandidateClient candidateClient;
 
     @PostMapping
-    public ResponseEntity<ExamResultDto> createExamResult(@RequestBody ExamResultDto request, @RequestHeader("loggedInUser") String username) {
+    public ResponseEntity<ExamResultDto> createExamResult(@RequestBody @Valid ExamResultDto request, @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);
         return ResponseEntity.ok(examResultService.createExamResult(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ExamResultDto> updateExamResult(@PathVariable("id") String id, @RequestBody ExamResultDto request, @RequestHeader("loggedInUser") String username) {
+    public ResponseEntity<ExamResultDto> updateExamResult(@PathVariable("id") String id, @RequestBody @Valid ExamResultDto request, @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);
         return ResponseEntity.ok(examResultService.updateExamResult(id, request));
     }

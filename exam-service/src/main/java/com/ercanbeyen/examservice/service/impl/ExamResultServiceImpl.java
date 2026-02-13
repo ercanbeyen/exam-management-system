@@ -8,6 +8,7 @@ import com.ercanbeyen.examservice.mapper.ExamResultMapper;
 import com.ercanbeyen.examservice.repository.ExamResultRepository;
 import com.ercanbeyen.examservice.service.ExamRegistrationService;
 import com.ercanbeyen.examservice.service.ExamResultService;
+import com.ercanbeyen.servicecommon.client.exception.ResourceConflictException;
 import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,11 @@ public class ExamResultServiceImpl implements ExamResultService {
     public ExamResultDto createExamResult(ExamResultDto request) {
         ExamResult examResult = examResultMapper.dtoToEntity(request);
         ExamRegistration examRegistration = examRegistrationService.findById(request.examRegistrationId());
+
+        if (examResultRepository.existsByExamRegistration(examRegistration)) {
+            throw new ResourceConflictException("Exam result is already available for the exam registration");
+        }
+
         examResult.setExamRegistration(examRegistration);
         return examResultMapper.entityToDto(examResultRepository.save(examResult));
     }
@@ -37,11 +43,20 @@ public class ExamResultServiceImpl implements ExamResultService {
     @Override
     public ExamResultDto updateExamResult(String id, ExamResultDto request) {
         ExamResult examResult = findById(id);
-        ExamRegistration examRegistration = examRegistrationService.findById(request.examRegistrationId());
+        String requestedExamRegistration = request.examRegistrationId();
+
+        if (!examResult.getExamRegistration().getId().equals(requestedExamRegistration)) {
+            ExamRegistration examRegistration = examRegistrationService.findById(requestedExamRegistration);
+
+            if (examResultRepository.existsByExamRegistration(examRegistration)) {
+                throw new ResourceConflictException("Exam result is already available for the exam registration");
+            }
+
+            examResult.setExamRegistration(examRegistration);
+        }
 
         examResult.setCandidateId(request.candidateId());
         examResult.setScore(request.score());
-        examResult.setExamRegistration(examRegistration);
 
         return examResultMapper.entityToDto(examResultRepository.save(examResult));
     }
