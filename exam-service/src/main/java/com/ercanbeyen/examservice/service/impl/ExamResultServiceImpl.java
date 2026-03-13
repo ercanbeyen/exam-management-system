@@ -1,6 +1,7 @@
 package com.ercanbeyen.examservice.service.impl;
 
 import com.ercanbeyen.examservice.client.CandidateClient;
+import com.ercanbeyen.examservice.constant.message.ResponseMessage;
 import com.ercanbeyen.examservice.dto.ExamResultDto;
 import com.ercanbeyen.examservice.entity.ExamRegistration;
 import com.ercanbeyen.examservice.entity.ExamResult;
@@ -16,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -33,23 +36,25 @@ public class ExamResultServiceImpl implements ExamResultService {
         ExamRegistration examRegistration = examRegistrationService.findById(request.examRegistrationId());
 
         if (examResultRepository.existsByExamRegistration(examRegistration)) {
-            throw new ResourceConflictException("Exam result is already available for the exam registration");
+            throw new ResourceConflictException(ResponseMessage.RESULT_AVAILABLE_FOR_REGISTRATION);
         }
 
         examResult.setExamRegistration(examRegistration);
+        examResult.setAnnouncedAt(LocalDateTime.now());
+
         return examResultMapper.entityToDto(examResultRepository.save(examResult));
     }
 
     @Override
     public ExamResultDto updateExamResult(String id, ExamResultDto request) {
         ExamResult examResult = findById(id);
-        String requestedExamRegistration = request.examRegistrationId();
+        String requestedExamRegistrationId = request.examRegistrationId();
 
-        if (!examResult.getExamRegistration().getId().equals(requestedExamRegistration)) {
-            ExamRegistration examRegistration = examRegistrationService.findById(requestedExamRegistration);
+        if (!examResult.getExamRegistration().getId().equals(requestedExamRegistrationId)) {
+            ExamRegistration examRegistration = examRegistrationService.findById(requestedExamRegistrationId);
 
             if (examResultRepository.existsByExamRegistration(examRegistration)) {
-                throw new ResourceConflictException("Exam result is already available for the exam registration");
+                throw new ResourceConflictException(ResponseMessage.RESULT_AVAILABLE_FOR_REGISTRATION);
             }
 
             examResult.setExamRegistration(examRegistration);
@@ -72,16 +77,20 @@ public class ExamResultServiceImpl implements ExamResultService {
     public List<ExamResultDto> getExamResults(String subject) {
         return examResultRepository.findAll()
                 .stream()
-                .filter(examResult -> examResult.getExamRegistration().getExamEvent().getExam().getSubject().equals(subject))
+                .filter(examResult -> examResult.getExamRegistration()
+                        .getExamEvent()
+                        .getExam()
+                        .getSubject()
+                        .equals(subject))
+                .sorted(Comparator.comparing(ExamResult::getScore).reversed()
+                        .thenComparing(ExamResult::getCandidateId))
                 .map(examResultMapper::entityToDto)
                 .toList();
     }
 
     @Override
     public Page<ExamResultDto> getExamResultsOfCandidate(String candidateId, int pageNumber, int pageSize) {
-        Sort sort = Sort.by("score")
-                .descending()
-                .and(Sort.by("candidateId").ascending());
+        Sort sort = Sort.by("announcedAt").descending();
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
         return examResultRepository.findAllByCandidateId(candidateId, pageable).map(examResultMapper::entityToDto);
     }
