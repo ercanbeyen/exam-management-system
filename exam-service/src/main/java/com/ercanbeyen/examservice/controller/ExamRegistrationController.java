@@ -1,5 +1,6 @@
 package com.ercanbeyen.examservice.controller;
 
+import com.ercanbeyen.examservice.client.CandidateClient;
 import com.ercanbeyen.examservice.dto.ExamRegistrationDto;
 import com.ercanbeyen.examservice.dto.response.ExamEntry;
 import com.ercanbeyen.examservice.service.ExamRegistrationService;
@@ -30,6 +31,7 @@ import java.util.List;
 public class ExamRegistrationController {
     private final ExamRegistrationService examRegistrationService;
     private final AuthClient authClient;
+    private final CandidateClient candidateClient;
 
     @Operation(summary = "Create exam registration")
     @ApiResponses(value = {
@@ -206,12 +208,50 @@ public class ExamRegistrationController {
             )
     })
     @GetMapping
-    public ResponseEntity<Page<ExamRegistrationDto>> getExamRegistrations(
+    public ResponseEntity<List<ExamRegistrationDto>> getExamRegistrations(
             @Parameter(
                     in = ParameterIn.QUERY,
-                    description = "Username of the candidate",
+                    description = "Subject of the exam",
                     required = true
-            ) @RequestParam("user") String candidateUsername,
+            ) @RequestParam("subject") String subject,
+            @Parameter(
+                    in = ParameterIn.QUERY,
+                    description = "Username of the candidate"
+            ) @RequestParam(value = "candidate", required = false) String candidateUsername,
+            @Parameter(
+                    in = ParameterIn.HEADER,
+                    description = "Username of the logged in user",
+                    required = true
+            ) @RequestHeader("loggedInUser") String loggedInUsername) {
+        authClient.checkUserHasAdminRole(loggedInUsername);
+        return ResponseEntity.ok(examRegistrationService.getExamRegistrations(subject, candidateUsername));
+    }
+
+    @Operation(summary = "Get exam registrations of the candidate")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Exam registrations are successfully fetched"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Unauthorized access",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    value = "{ \"httpStatus\": \"403\", \"errorCode\": \"AUTH-SERVICE-1004\", \"message\": \"Unauthorized access\" }"
+                            )
+                    )
+            )
+    })
+    @GetMapping("/candidates/{candidateId}")
+    public ResponseEntity<Page<ExamRegistrationDto>> getExamRegistrationsOfCandidate(
+            @Parameter(
+                    in = ParameterIn.PATH,
+                    description = "Id of the candidate",
+                    required = true
+            ) @PathVariable("candidateId") String candidateId,
             @Parameter(
                     in = ParameterIn.QUERY,
                     description = "Page number"
@@ -224,9 +264,9 @@ public class ExamRegistrationController {
                     in = ParameterIn.HEADER,
                     description = "Username of the logged in user",
                     required = true
-            ) @RequestHeader("loggedInUser") String loggedInUsername) {
-        authClient.checkLoggedInUser(candidateUsername, loggedInUsername);
-        return ResponseEntity.ok(examRegistrationService.getExamRegistrations(candidateUsername, pageNumber, pageSize));
+            ) @RequestHeader("loggedInUser") String username) {
+        candidateClient.checkCandidate(candidateId, username);
+        return ResponseEntity.ok(examRegistrationService.getExamRegistrationsOfCandidate(candidateId, pageNumber, pageSize));
     }
 
     @Operation(summary = "Get exam entries")

@@ -11,7 +11,8 @@ public interface ExamRegistrationService {
     ExamRegistrationDto createExamRegistration(ExamRegistrationDto request, String username);
     ExamRegistrationDto updateExamRegistration(String id, ExamRegistrationDto request, String username);
     ExamRegistrationDto getExamRegistration(String id, String username);
-    Page<ExamRegistrationDto> getExamRegistrations(String username, int pageNumber, int pageSize);
+    List<ExamRegistrationDto> getExamRegistrations(String subject, String candidateUsername);
+    Page<ExamRegistrationDto> getExamRegistrationsOfCandidate(String candidateId, int pageNumber, int pageSize);
     List<ExamEntry> getExamEntries(String examEventId, String username);
     String deleteExamRegistration(String id, String username);
     ExamRegistration findById(String id);

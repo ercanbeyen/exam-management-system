@@ -3,6 +3,7 @@ package com.ercanbeyen.examservice.service.impl;
 import com.ercanbeyen.examservice.client.CandidateClient;
 import com.ercanbeyen.examservice.constant.message.ResponseMessage;
 import com.ercanbeyen.examservice.dto.ExamResultDto;
+import com.ercanbeyen.examservice.dto.response.ExamResultResponse;
 import com.ercanbeyen.examservice.entity.ExamRegistration;
 import com.ercanbeyen.examservice.entity.ExamResult;
 import com.ercanbeyen.examservice.mapper.ExamResultMapper;
@@ -14,12 +15,15 @@ import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor
@@ -74,25 +78,42 @@ public class ExamResultServiceImpl implements ExamResultService {
     }
 
     @Override
-    public List<ExamResultDto> getExamResults(String subject) {
-        return examResultRepository.findAll()
-                .stream()
-                .filter(examResult -> examResult.getExamRegistration()
+    public List<ExamResultDto> getExamResults(String subject, String candidateUsername) {
+        String candidateId = Optional.ofNullable(candidateUsername).isPresent() ? candidateClient.getCandidateIdByUsername(candidateUsername) : StringUtils.EMPTY;
+        Predicate<ExamResult> examResultPredicate = examResult ->
+                (candidateId.equals(StringUtils.EMPTY) || (examResult.getCandidateId().equals(candidateId))
+                        && examResult.getExamRegistration()
                         .getExamEvent()
                         .getExam()
                         .getSubject()
-                        .equals(subject))
-                .sorted(Comparator.comparing(ExamResult::getScore).reversed()
-                        .thenComparing(ExamResult::getCandidateId))
+                        .equals(subject));
+
+        Comparator<ExamResult> examResultComparator = Comparator.comparing(ExamResult::getScore)
+                .reversed()
+                .thenComparing(ExamResult::getCandidateId);
+
+        return examResultRepository.findAll()
+                .stream()
+                .filter(examResultPredicate)
+                .sorted(examResultComparator)
                 .map(examResultMapper::entityToDto)
                 .toList();
     }
 
     @Override
-    public Page<ExamResultDto> getExamResultsOfCandidate(String candidateId, int pageNumber, int pageSize) {
+    public Page<ExamResultResponse> getExamResultsOfCandidate(String candidateId, int pageNumber, int pageSize) {
         Sort sort = Sort.by("announcedAt").descending();
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
-        return examResultRepository.findAllByCandidateId(candidateId, pageable).map(examResultMapper::entityToDto);
+        return examResultRepository.findAllByCandidateId(candidateId, pageable)
+                .map(examResult -> new ExamResultResponse(
+                        examResult.getId(),
+                        examResult.getExamRegistration()
+                                .getExamEvent()
+                                .getExam()
+                                .getSubject(),
+                        examResult.getCandidateId(),
+                        examResult.getScore(),
+                        examResult.getAnnouncedAt()));
     }
 
     @Override

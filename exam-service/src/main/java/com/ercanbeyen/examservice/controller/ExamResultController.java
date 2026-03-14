@@ -3,6 +3,7 @@ package com.ercanbeyen.examservice.controller;
 import com.ercanbeyen.examservice.client.AuthClient;
 import com.ercanbeyen.examservice.client.CandidateClient;
 import com.ercanbeyen.examservice.dto.ExamResultDto;
+import com.ercanbeyen.examservice.dto.response.ExamResultResponse;
 import com.ercanbeyen.examservice.service.ExamResultService;
 import com.ercanbeyen.servicecommon.client.exception.response.ErrorResponse;
 import com.ercanbeyen.servicecommon.client.response.MessageResponse;
@@ -218,12 +219,16 @@ public class ExamResultController {
                     required = true
             ) @RequestParam("subject") String subject,
             @Parameter(
+                    in = ParameterIn.QUERY,
+                    description = "Username of the candidate"
+            ) @RequestParam(value = "candidate", required = false) String candidateUsername,
+            @Parameter(
                     in = ParameterIn.HEADER,
                     description = "Username of the logged in user",
                     required = true
             ) @RequestHeader("loggedInUser") String username) {
         authClient.checkUserHasAdminRole(username);
-        return ResponseEntity.ok(examResultService.getExamResults(subject));
+        return ResponseEntity.ok(examResultService.getExamResults(subject, candidateUsername));
     }
 
     @Operation(summary = "Get exam results of the candidate")
@@ -245,7 +250,7 @@ public class ExamResultController {
             )
     })
     @GetMapping("/candidates/{candidateId}")
-    public ResponseEntity<Page<ExamResultDto>> getExamResultsOfCandidate(
+    public ResponseEntity<Page<ExamResultResponse>> getExamResultsOfCandidate(
             @Parameter(
                     in = ParameterIn.PATH,
                     description = "Id of the candidate",

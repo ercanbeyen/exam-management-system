@@ -21,13 +21,17 @@ import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor
@@ -113,8 +117,26 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     }
 
     @Override
-    public Page<ExamRegistrationDto> getExamRegistrations(String username, int pageNumber, int pageSize) {
-        String candidateId = candidateClient.getCandidateIdByUsername(username);
+    public List<ExamRegistrationDto> getExamRegistrations(String subject, String candidateUsername) {
+        String candidateId = Optional.ofNullable(candidateUsername).isPresent() ? candidateClient.getCandidateIdByUsername(candidateUsername) : StringUtils.EMPTY;
+        Predicate<ExamRegistration> examRegistrationPredicate = examRegistration ->
+                (candidateId.equals(StringUtils.EMPTY) || (examRegistration.getCandidateId().equals(candidateId)) && examRegistration.getExamEvent()
+                        .getExam()
+                        .getSubject()
+                        .equals(subject));
+
+        Comparator<ExamRegistration> examRegistrationComparator = Comparator.comparing(ExamRegistration::getUpdatedAt).reversed();
+
+        return examRegistrationRepository.findAll()
+                .stream()
+                .filter(examRegistrationPredicate)
+                .sorted(examRegistrationComparator)
+                .map(examRegistrationMapper::entityToDto)
+                .toList();
+    }
+
+    @Override
+    public Page<ExamRegistrationDto> getExamRegistrationsOfCandidate(String candidateId, int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by("updatedAt", "createdAt").descending());
 
         List<ExamRegistrationDto> examRegistrationDtos = examRegistrationRepository.findAllByCandidateId(candidateId, pageable)
