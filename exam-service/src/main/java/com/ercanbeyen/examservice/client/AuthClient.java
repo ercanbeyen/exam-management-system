@@ -28,15 +28,6 @@ public class AuthClient {
         log.info("User {} has {} role", username, role);
     }
 
-    public void checkLoggedInUser(String candidateUsername, String loggedInUsername) {
-        if (!candidateUsername.equals(loggedInUsername)) {
-            log.error("Usernames are not matching: {} & {}", candidateUsername, loggedInUsername);
-            throw new ResourceForbiddenException(ResponseMessage.UNAUTHORIZED_ACCESS);
-        }
-
-        log.info("Notification belongs to user {}", loggedInUsername);
-    }
-
     private boolean checkUserHasRole(String username, Role role) {
         ResponseEntity<Boolean> response = authServiceClient.checkUserRole(username, role.toString());
         Boolean body = response.getBody();

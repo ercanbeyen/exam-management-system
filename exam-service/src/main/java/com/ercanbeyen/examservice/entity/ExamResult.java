@@ -14,7 +14,6 @@ public class ExamResult {
     private String id;
     @OneToOne
     private ExamRegistration examRegistration;
-    private String candidateId;
     private Double score;
     private LocalDateTime announcedAt;
 }

@@ -223,8 +223,8 @@ public class CandidateController {
                     in = ParameterIn.HEADER,
                     description = "Username of the logged in user",
                     required = true
-            ) @RequestHeader("loggedInUser") String loggedInUsername) {
-        authClient.checkLoggedInUser(candidateUsername, loggedInUsername);
+            ) @RequestHeader("loggedInUser") String username) {
+        authClient.checkLoggedInUser(candidateUsername, username);
         return ResponseEntity.ok(candidateService.getCandidateByUsername(candidateUsername));
     }
 

@@ -120,10 +120,10 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     public List<ExamRegistrationDto> getExamRegistrations(String subject, String candidateUsername) {
         String candidateId = Optional.ofNullable(candidateUsername).isPresent() ? candidateClient.getCandidateIdByUsername(candidateUsername) : StringUtils.EMPTY;
         Predicate<ExamRegistration> examRegistrationPredicate = examRegistration ->
-                (candidateId.equals(StringUtils.EMPTY) || (examRegistration.getCandidateId().equals(candidateId)) && examRegistration.getExamEvent()
+                (candidateId.equals(StringUtils.EMPTY) || examRegistration.getCandidateId().equals(candidateId)) && examRegistration.getExamEvent()
                         .getExam()
                         .getSubject()
-                        .equals(subject));
+                        .equals(subject);
 
         Comparator<ExamRegistration> examRegistrationComparator = Comparator.comparing(ExamRegistration::getUpdatedAt).reversed();
 

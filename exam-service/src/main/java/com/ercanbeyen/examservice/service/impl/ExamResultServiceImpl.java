@@ -3,6 +3,7 @@ package com.ercanbeyen.examservice.service.impl;
 import com.ercanbeyen.examservice.client.CandidateClient;
 import com.ercanbeyen.examservice.constant.message.ResponseMessage;
 import com.ercanbeyen.examservice.dto.ExamResultDto;
+import com.ercanbeyen.examservice.dto.builder.ExamResultResponseBuilder;
 import com.ercanbeyen.examservice.dto.response.ExamResultResponse;
 import com.ercanbeyen.examservice.entity.ExamRegistration;
 import com.ercanbeyen.examservice.entity.ExamResult;
@@ -64,7 +65,6 @@ public class ExamResultServiceImpl implements ExamResultService {
             examResult.setExamRegistration(examRegistration);
         }
 
-        examResult.setCandidateId(request.candidateId());
         examResult.setScore(request.score());
 
         return examResultMapper.entityToDto(examResultRepository.save(examResult));
@@ -73,7 +73,7 @@ public class ExamResultServiceImpl implements ExamResultService {
     @Override
     public ExamResultDto getExamResult(String id, String username) {
         ExamResult examResult = findById(id);
-        candidateClient.checkCandidate(examResult.getCandidateId(), username);
+        candidateClient.checkCandidate(examResult.getExamRegistration().getCandidateId(), username);
         return examResultMapper.entityToDto(examResult);
     }
 
@@ -81,16 +81,16 @@ public class ExamResultServiceImpl implements ExamResultService {
     public List<ExamResultDto> getExamResults(String subject, String candidateUsername) {
         String candidateId = Optional.ofNullable(candidateUsername).isPresent() ? candidateClient.getCandidateIdByUsername(candidateUsername) : StringUtils.EMPTY;
         Predicate<ExamResult> examResultPredicate = examResult ->
-                (candidateId.equals(StringUtils.EMPTY) || (examResult.getCandidateId().equals(candidateId))
+                (candidateId.equals(StringUtils.EMPTY) || examResult.getExamRegistration().getCandidateId().equals(candidateId))
                         && examResult.getExamRegistration()
                         .getExamEvent()
                         .getExam()
                         .getSubject()
-                        .equals(subject));
+                        .equals(subject);
 
         Comparator<ExamResult> examResultComparator = Comparator.comparing(ExamResult::getScore)
                 .reversed()
-                .thenComparing(ExamResult::getCandidateId);
+                .thenComparing(examResult -> examResult.getExamRegistration().getCandidateId());
 
         return examResultRepository.findAll()
                 .stream()
@@ -104,16 +104,7 @@ public class ExamResultServiceImpl implements ExamResultService {
     public Page<ExamResultResponse> getExamResultsOfCandidate(String candidateId, int pageNumber, int pageSize) {
         Sort sort = Sort.by("announcedAt").descending();
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
-        return examResultRepository.findAllByCandidateId(candidateId, pageable)
-                .map(examResult -> new ExamResultResponse(
-                        examResult.getId(),
-                        examResult.getExamRegistration()
-                                .getExamEvent()
-                                .getExam()
-                                .getSubject(),
-                        examResult.getCandidateId(),
-                        examResult.getScore(),
-                        examResult.getAnnouncedAt()));
+        return examResultRepository.findAllByCandidateId(candidateId, pageable).map(ExamResultResponseBuilder::build);
     }
 
     @Override
