@@ -23,8 +23,9 @@ Servers:
 - Gateway: 8080
 
 ### Requirements
-- User must log in to use the application.
-- Exam registration should include school, classroom, date, time and candidate information.
+- To use the application, user must register and then log in.
+- Exam registration must include the exam location, time, and candidate information.
+- The exam result should include the score obtained, the time it will be announced, and registration information.
 
 ### Tech Stack
 ---
@@ -71,8 +72,8 @@ Then you should run the following applications in order
 - Use Admin Server to monitor health of services.
 - Use Zipkin Server to trace requests.
 
-### Api Documentation
+### API Documentation
 ---
-You may use Swagger-UI with the port of the application you configured to access the project's api documentation.<br/>
-You should use the below url to access the Swagger-UI.<br/>
+You may use Swagger-UI with the port of the application you configured to access the project's API documentation.<br/>
+You should use the below URL to access the Swagger-UI.<br/>
 `http://localhost:${PORT}/swagger-ui.html`
