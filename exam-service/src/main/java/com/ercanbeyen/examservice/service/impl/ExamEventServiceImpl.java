@@ -51,7 +51,7 @@ public class ExamEventServiceImpl implements ExamEventService {
     }
 
     @Override
-    public ExamEventDto updateExamEvent(String id, ExamEventDto request, String username) {
+    public ExamEventDto updateExamEvent(String id, ExamEventDto request) {
         checkProctors(request);
         checkExamEventConflicts(request);
 
@@ -93,7 +93,7 @@ public class ExamEventServiceImpl implements ExamEventService {
     public ExamEvent findExamEventBySubjectAndLocationAndPeriod(String examSubject, ExamLocation examLocation, ExamPeriod examPeriod) {
         ExamLocation requestedExamLocation = new ExamLocation(examLocation.getSchool(), examLocation.getClassroom());
         return examEventRepository.findByExamSubjectAndExamLocationAndExamPeriod(examSubject, requestedExamLocation, examPeriod.getDate())
-                .orElseThrow(() -> new ResourceNotFoundException("Exam event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Exam event is not found"));
     }
 
     private ExamEvent constructExamEvent(String id, ExamEventDto request) {
@@ -162,9 +162,7 @@ public class ExamEventServiceImpl implements ExamEventService {
     }
 
     private void checkProctors(ExamEventDto request) {
-        request.proctors()
-                .forEach(candidateClient::checkCandidateByUsername);
-
+        request.proctors().forEach(candidateClient::checkCandidateByUsername);
         log.info("Proctors exist");
     }
 }

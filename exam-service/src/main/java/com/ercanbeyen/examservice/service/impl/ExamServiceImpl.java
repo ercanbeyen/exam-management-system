@@ -31,7 +31,7 @@ public class ExamServiceImpl implements ExamService {
         Exam exam = findById(id);
 
         exam.setSubject(request.subject());
-        exam.setExamPeriod(request.period());
+        exam.setExamPeriod(request.examPeriod());
 
         return examMapper.entityToDto(examRepository.save(exam));
     }

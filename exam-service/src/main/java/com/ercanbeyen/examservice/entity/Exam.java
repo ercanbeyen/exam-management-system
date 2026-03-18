@@ -33,7 +33,7 @@ public class Exam {
                 "id='" + id + '\'' +
                 ", subject='" + subject + '\'' +
                 ", registrationPeriod=" + registrationPeriod +
-                ", period=" + examPeriod +
+                ", examPeriod=" + examPeriod +
                 ", examEvents=" + examEventsIds +
                 '}';
     }

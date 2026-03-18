@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ExamEventService {
     ExamEventDto createExamEvent(ExamEventDto request, String username);
-    ExamEventDto updateExamEvent(String id, ExamEventDto request, String username);
+    ExamEventDto updateExamEvent(String id, ExamEventDto request);
     ExamEventDto getExamEvent(String id, String username);
     List<ExamEventDto> getExamEvents(String username);
     String deleteExamEvent(String id, String username);

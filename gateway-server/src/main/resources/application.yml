@@ -13,7 +13,7 @@ spring:
         - id: EXAM-SERVICE
           uri: lb://EXAM-SERVICE
           predicates:
-            - Path=/exams/**, /exam-events/**, /exam-registrations/**, /EXAM-SERVICE/v3/api-docs
+            - Path=/exams/**, /exam-events/**, /exam-registrations/**, /exam-results/**, /EXAM-SERVICE/v3/api-docs
           filters:
             - AuthenticationFilter=USER
             - AddRequestHeader=X-Client,web

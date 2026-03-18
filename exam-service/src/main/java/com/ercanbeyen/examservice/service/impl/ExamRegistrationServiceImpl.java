@@ -21,11 +21,17 @@ import com.ercanbeyen.servicecommon.client.exception.ResourceNotFoundException;
 import com.ercanbeyen.servicecommon.client.message.logging.LogMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor
@@ -42,15 +48,15 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
 
     @Override
     public ExamRegistrationDto createExamRegistration(ExamRegistrationDto request, String username) {
+        String candidateId = request.candidateId();
+        candidateClient.checkCandidate(candidateId, username);
+
         ExamEventDto examEventDto = request.examEventDto();
         Exam exam = examService.findBySubject(examEventDto.examSubject());
         ExamEvent examEvent = examEventService.findExamEventBySubjectAndLocationAndPeriod(
                 examEventDto.examSubject(), examEventDto.location(), exam.getExamPeriod());
 
         ExamRegistrationValidator.checkExamRegistrationPeriod(examEvent.getExam());
-
-        String candidateId = request.candidateId();
-        candidateClient.checkCandidate(username, candidateId);
 
         checkIsUserProctorInExam(username, exam);
 
@@ -87,11 +93,10 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         ExamRegistrationValidator.checkExamRegistrationPeriod(exam);
 
         ExamEventDto examEventDto = request.examEventDto();
-        ExamEvent examEvent = examEventService.findExamEventBySubjectAndLocationAndPeriod(
-                examEventDto.examSubject(), examEventDto.location(), exam.getExamPeriod());
+        ExamEvent examEvent = examEventService.findExamEventBySubjectAndLocationAndPeriod(examEventDto.examSubject(), examEventDto.location(), exam.getExamPeriod());
 
         String candidateId = request.candidateId();
-        candidateClient.checkCandidate(username, candidateId);
+        candidateClient.checkCandidate(candidateId, username);
 
         if (!examEvent.getId().equals(examRegistration.getExamEvent().getId())) {
             log.info("Classroom of candidate may check. Classroom capacity must be checked before update");
@@ -107,19 +112,39 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     @Override
     public ExamRegistrationDto getExamRegistration(String id, String username) {
         ExamRegistration examRegistration = findById(id);
-        candidateClient.checkCandidate(username, id);
-
+        candidateClient.checkCandidate(examRegistration.getCandidateId(), username);
         return examRegistrationMapper.entityToDto(examRegistration);
     }
 
     @Override
-    public List<ExamRegistrationDto> getExamRegistrations(String username) {
-        String candidateId = candidateClient.getCandidateId(username);
+    public List<ExamRegistrationDto> getExamRegistrations(String subject, String candidateUsername) {
+        String candidateId = Optional.ofNullable(candidateUsername).isPresent() ? candidateClient.getCandidateIdByUsername(candidateUsername) : StringUtils.EMPTY;
+        Predicate<ExamRegistration> examRegistrationPredicate = examRegistration ->
+                (candidateId.equals(StringUtils.EMPTY) || examRegistration.getCandidateId().equals(candidateId)) && examRegistration.getExamEvent()
+                        .getExam()
+                        .getSubject()
+                        .equals(subject);
 
-        return examRegistrationRepository.findAllByCandidateId(candidateId)
+        Comparator<ExamRegistration> examRegistrationComparator = Comparator.comparing(ExamRegistration::getUpdatedAt).reversed();
+
+        return examRegistrationRepository.findAll()
                 .stream()
+                .filter(examRegistrationPredicate)
+                .sorted(examRegistrationComparator)
                 .map(examRegistrationMapper::entityToDto)
                 .toList();
+    }
+
+    @Override
+    public Page<ExamRegistrationDto> getExamRegistrationsOfCandidate(String candidateId, int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by("updatedAt", "createdAt").descending());
+
+        List<ExamRegistrationDto> examRegistrationDtos = examRegistrationRepository.findAllByCandidateId(candidateId, pageable)
+                .filter(examRegistration -> examRegistration.getExamEvent().getExam().getExamPeriod().getDate().isAfter(LocalDate.now()))
+                .map(examRegistrationMapper::entityToDto)
+                .toList();
+
+        return new PageImpl<>(examRegistrationDtos);
     }
 
     @Override
@@ -143,9 +168,7 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
         examRegistrationRepository.findAllByExamEvent(examEvent)
                 .forEach(examRegistration -> {
                     Exam exam = examEvent.getExam();
-
                     ExamEntry examEntry = new ExamEntry(examRegistration.getCandidateId(), exam.getSubject(), examEvent.getLocation(), exam.getExamPeriod());
-
                     examEntries.add(examEntry);
                 });
 
@@ -156,13 +179,14 @@ public class ExamRegistrationServiceImpl implements ExamRegistrationService {
     public String deleteExamRegistration(String id, String username) {
         ExamRegistration examRegistration = findById(id);
         ExamRegistrationValidator.checkExamRegistrationPeriod(examRegistration.getExamEvent().getExam());
-        candidateClient.checkCandidate(username, examRegistration.getCandidateId());
+        candidateClient.checkCandidate(examRegistration.getCandidateId(), username);
 
         examRegistrationRepository.delete(examRegistration);
         return "Exam registration is successfully deleted";
     }
 
-    private ExamRegistration findById(String id) {
+    @Override
+    public ExamRegistration findById(String id) {
         ExamRegistration examRegistration = examRegistrationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Exam registration is not found"));
 

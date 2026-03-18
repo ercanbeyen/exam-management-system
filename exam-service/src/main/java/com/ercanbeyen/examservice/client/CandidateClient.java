@@ -15,8 +15,8 @@ public class CandidateClient {
     public static final String CANDIDATE = "Candidate";
     private final CandidateServiceClient candidateServiceClient;
 
-    public void checkCandidate(String loggedInUsername, String candidateId) {
-        getCandidate(loggedInUsername, candidateId);
+    public void checkCandidate(String candidateId, String loggedInUsername) {
+        getCandidate(candidateId, loggedInUsername);
         log.info(LogMessage.RESOURCE_FOUND, CANDIDATE, candidateId);
     }
 
@@ -25,15 +25,15 @@ public class CandidateClient {
         log.info(LogMessage.RESOURCE_FOUND, CANDIDATE, username);
     }
 
-    public String getCandidateId(String loggedInUsername) {
-        ResponseEntity<CandidateDto> candidateServiceResponse = candidateServiceClient.getCandidateByUsername(loggedInUsername, loggedInUsername);
+    public String getCandidateIdByUsername(String username) {
+        ResponseEntity<CandidateDto> candidateServiceResponse = candidateServiceClient.getCandidateByUsername(username, username);
         log.debug(LogMessage.CLIENT_SERVICE_RESPONSE, CANDIDATE, candidateServiceResponse);
 
         assert candidateServiceResponse.getBody() != null;
         return candidateServiceResponse.getBody().id();
     }
 
-    private void getCandidate(String loggedInUsername, String candidateId) {
+    private void getCandidate(String candidateId, String loggedInUsername) {
         ResponseEntity<CandidateDto> candidateServiceResponse = candidateServiceClient.getCandidate(candidateId, loggedInUsername);
         log.debug(LogMessage.CLIENT_SERVICE_RESPONSE, CANDIDATE, candidateServiceResponse);
     }

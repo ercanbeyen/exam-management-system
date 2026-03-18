@@ -53,16 +53,13 @@ public class CandidateServiceImpl implements CandidateService {
     public CandidateDto getCandidate(String id, String username) {
         Candidate candidate = findById(id);
         authClient.checkLoggedInUser(candidate.getUsername(), username);
-
         return candidateMapper.entityToDto(candidate);
     }
 
     @Override
-    public CandidateDto getCandidateByUsername(String username, String loggedInUsername) {
+    public CandidateDto getCandidateByUsername(String username) {
         Candidate candidate = candidateRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Candidate %s is not found", username)));
-
-        authClient.checkLoggedInUser(username, loggedInUsername);
 
         return candidateMapper.entityToDto(candidate);
     }
